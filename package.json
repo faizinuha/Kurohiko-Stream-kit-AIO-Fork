@@ -1,0 +1,80 @@
+{
+  "name": "KSK-Stream-kit-aio",
+  "productName" : "Kurohiko Stream kit AIO",
+  "author": "Kurohiko",
+  "version": "0.0.1",
+  "description": "Kurohiko Stream Kit AIO — Meme overlay & deck controller untuk streamer",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "electron": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --win",
+    "build:all": "electron-builder --win --mac --linux"
+  },
+  "dependencies": {
+    "archiver": "^6.0.1",
+    "express": "^4.18.2",
+    "ffmpeg-static": "^5.3.0",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.6.1",
+    "unzipper": "^0.12.3"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+"build": {
+  "asarUnpack": [
+  "**/server.js",
+  "node_modules/**"
+],
+  "appId": "com.kurohiko.streamkit",
+  "productName": "KSK Stream Kit AIO",
+  "copyright": "Copyright © 2025 Kurohiko",
+  "icon": "build/icon.png",
+  "files": [
+    "electron/**/*",
+    "public/**/*",
+    "build/**/*",
+    "server.js",
+    "lang/**/*",
+    "ksk-ui.js",
+    "node_modules/**/*",
+    "!node_modules/electron",
+    "!node_modules/electron-builder",
+    "!**/*.map",
+    "!**/test*",
+    "!**/spec*"
+  ],
+    "extraResources": [],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "KSK Streamkit AIO",
+      "displayLanguageSelector": false,
+      "language": "1057"
+    },
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    }
+  }
+}

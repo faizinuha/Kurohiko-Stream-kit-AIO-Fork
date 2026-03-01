@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSK Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Syne+Mono&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09090d;--s1:#111118;--s2:#18181f;--s3:#1e1e28;--bd:#1e1e28;--bd2:#2a2a38;--ac:#38bdf8;--adim:rgba(56,189,248,.1);--ac2:#7dd3fc;--gn:#22c55e;--tx:#e4e4f0;--tx2:#6b6b8a;--tx3:#3a3a50;--r:8px;--rs:5px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;overflow:hidden;}
+.shell{display:flex;height:100vh;overflow:hidden;}
+.main-wrap{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+
+/* SIDEBAR */
+#dmask{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:40;display:none;opacity:0;transition:opacity .2s;}
+#dmask.open{display:block;opacity:1;}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;z-index:50;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+#sidebar.open{transform:translateX(0);}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 18px;color:var(--tx2);font-size:.76rem;font-weight:600;text-decoration:none;transition:all .15s;position:relative;cursor:pointer;}
+.nav-item:hover{color:var(--tx);background:rgba(255,255,255,.03);}
+.nav-item.active{color:var(--ac);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--ac);border-radius:0 3px 3px 0;}
+.nav-sep{height:1px;background:var(--bd);margin:6px 16px;}
+
+/* TOPBAR */
+.topbar{background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;padding:0 12px;height:52px;flex-shrink:0;}
+.burger{background:none;border:1px solid var(--bd2);color:var(--tx2);width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
+.burger:hover{border-color:var(--ac);color:var(--ac);}
+.logo{font-size:.82rem;font-weight:800;letter-spacing:2px;color:var(--ac);}
+.logo span{color:var(--tx2);font-weight:400;}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--tx3);}
+.sdot.on{background:var(--gn);box-shadow:0 0 6px var(--gn);}
+.sp{flex:1;}
+.topbtn{border:1px solid var(--bd2);color:var(--tx2);padding:5px 11px;border-radius:100px;font-size:.62rem;font-weight:700;cursor:pointer;white-space:nowrap;background:transparent;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.topbtn:hover{border-color:var(--ac);color:var(--ac);}
+.tbtn-ac{border-color:var(--ac);color:var(--ac);background:rgba(56,189,248,.08);}
+.status-pill{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.08);color:var(--gn);padding:3px 9px;border-radius:99px;font-size:.56rem;font-weight:700;border:1px solid rgba(34,197,94,.18);letter-spacing:.5px;flex-shrink:0;}
+.status-pill .sdot{width:5px;height:5px;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.brand-text{font-size:.85rem;font-weight:800;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif;}
+.brand-text span{color:var(--ac);}
+
+/* OBS DROPDOWN */
+.obs-wrap{position:relative;}
+.obs-dd{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--bd2);border-radius:8px;padding:4px;min-width:160px;z-index:60;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+.obs-dd.open{display:block;}
+.obs-dd-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;font-size:.62rem;font-weight:600;color:var(--tx2);cursor:pointer;white-space:nowrap;transition:all .12s;font-family:'Syne',sans-serif;}
+.obs-dd-item:hover{background:var(--adim);color:var(--ac);}
+.obs-dd-item svg{flex-shrink:0;}
+
+/* SEARCH */
+.searchbar{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.sbox{flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:6px 10px;border-radius:var(--rs);font-size:.72rem;outline:none;}
+.sbox::placeholder{color:var(--tx3);}
+.setbtn{background:var(--s2);border:1px solid var(--bd);color:var(--tx2);padding:6px 10px;border-radius:var(--rs);font-size:.75rem;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.setbtn:hover{border-color:var(--ac);color:var(--ac);}
+
+/* TABS */
+.tabbar{display:flex;align-items:center;background:var(--s1);border-bottom:1px solid var(--bd);padding:0 10px;overflow-x:auto;gap:2px;flex-shrink:0;}
+.tabbar::-webkit-scrollbar{height:2px;}
+.tabbar::-webkit-scrollbar-thumb{background:var(--bd2);}
+.tab{padding:8px 12px;font-size:.65rem;font-weight:700;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;user-select:none;border-radius:var(--rs) var(--rs) 0 0;}
+.tab:hover{color:var(--tx);}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac);}
+.tab-add{padding:7px 10px;font-size:.8rem;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;flex-shrink:0;transition:all .15s;}
+.tab-add:hover{color:var(--ac2);}
+
+/* GRID */
+.gwrap{overflow-y:auto;padding:8px;flex:1;}
+.gwrap::-webkit-scrollbar{width:3px;}
+.gwrap::-webkit-scrollbar-thumb{background:var(--bd2);}
+.grid{display:grid;gap:7px;}
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .12s;position:relative;aspect-ratio:1;-webkit-tap-highlight-color:transparent;}
+.card:hover{transform:scale(1.03);}
+.card:active{transform:scale(0.95);}
+.card.act{border-color:var(--gn);box-shadow:0 0 0 1px var(--gn),0 0 12px rgba(34,197,94,.2);}
+.card.nc{border-color:var(--ac2);border-style:dashed;opacity:.6;}
+.card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+.vaudio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:3px;}
+.vaudio-ic{font-size:1.4rem;}
+.vaudio-nm{font-size:.46rem;color:var(--tx2);text-align:center;padding:0 4px;word-break:break-all;}
+.clbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.92));padding:12px 4px 3px;font-size:.46rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.clive{position:absolute;top:3px;left:3px;background:var(--gn);color:#000;font-size:.44rem;font-weight:700;font-family:'Syne Mono',monospace;padding:1px 4px;border-radius:2px;display:none;}
+.card.act .clive{display:block;}
+.empty{grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-size:.78rem;line-height:2;}
+
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);z-index:50;display:none;align-items:center;justify-content:center;padding:14px;}
+.overlay.open{display:flex;}
+.panel{background:var(--s1);border:1px solid var(--bd2);border-radius:10px;width:100%;display:flex;flex-direction:column;max-height:90vh;}
+.set-panel{max-width:340px;}
+.phd{padding:12px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.phd-title{font-size:.8rem;font-weight:700;}
+.pclose{background:none;border:1px solid var(--bd);color:var(--tx2);width:22px;height:22px;border-radius:var(--rs);cursor:pointer;font-size:.8rem;}
+.pclose:hover{border-color:var(--ac);color:var(--ac);}
+.pbody{padding:14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+.pbody::-webkit-scrollbar{width:3px;}
+.fl{font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx2);margin-bottom:6px;}
+.gsz-wrap{display:flex;flex-direction:column;gap:6px;}
+.gsz-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;}
+.gsz-cell{aspect-ratio:1;border:1px solid var(--bd2);border-radius:3px;cursor:pointer;transition:all .1s;background:var(--s3);}
+.gsz-cell.hover{background:var(--adim);border-color:var(--ac);}
+.gsz-label{font-family:'Syne Mono',monospace;font-size:.62rem;color:var(--ac2);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--s3);border-radius:var(--rs);cursor:pointer;}
+.toggle-row span{font-size:.72rem;color:var(--tx);}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--bd2);position:relative;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--ac);}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.toggle.on::after{left:19px;}
+.tab-panel{max-width:420px;}
+.tab-panel .pbody{gap:10px;}
+.tab-name-inp{width:100%;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:var(--rs);outline:none;padding:8px 10px;font-size:.82rem;}
+.tab-name-inp:focus{border-color:var(--ac);}
+.char-count{font-family:'Syne Mono',monospace;font-size:.6rem;color:var(--tx3);flex-shrink:0;}
+.meme-sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;max-height:280px;overflow-y:auto;padding:2px;}
+.meme-sel-grid::-webkit-scrollbar{width:3px;}
+.meme-sel-grid::-webkit-scrollbar-thumb{background:var(--bd2);}
+.sel-card{position:relative;aspect-ratio:1;border-radius:var(--rs);overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .12s;}
+.sel-card:hover{border-color:var(--bd2);}
+.sel-card.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac);}
+.sel-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.sel-check{position:absolute;top:2px;right:2px;width:16px;height:16px;background:var(--ac);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.5rem;color:#000;}
+.sel-card.on .sel-check{display:flex;}
+.sel-card-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.85);padding:8px 3px 2px;font-size:.44rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.saudio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:var(--s2);gap:2px;}
+.saudio span{font-size:1.1rem;}
+.saudio small{font-size:.42rem;color:var(--tx2);text-align:center;padding:0 2px;word-break:break-all;}
+.pfooter{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
+.bsave{background:var(--ac);border:none;color:#000;padding:8px 18px;border-radius:var(--rs);font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;}
+.bsave:hover{opacity:.85;}
+.bcnl{background:var(--s3);border:1px solid var(--bd2);color:var(--tx2);padding:8px 13px;border-radius:var(--rs);font-family:'Syne',sans-serif;font-size:.75rem;cursor:pointer;}
+.bdel{background:rgba(239,68,68,.08);border:1px solid #ef4444;color:#ef4444;padding:8px 13px;border-radius:var(--rs);font-family:'Syne',sans-serif;font-size:.75rem;cursor:pointer;}
+
+
+/* COUNTER COLOR */
+.counter-btn.color-custom{border-color:var(--counter-color,var(--ac));}
+.counter-btn.color-custom .counter-btn-val{color:var(--counter-color,var(--ac))!important;text-shadow:0 0 20px color-mix(in srgb,var(--counter-color,var(--ac)) 40%,transparent)!important;}
+.counter-btn.color-custom .counter-progress{background:var(--counter-color,var(--ac));}
+/* COUNTER EDIT OVERLAY */
+.counter-edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);z-index:60;display:none;align-items:center;justify-content:center;padding:14px;}
+.counter-edit-overlay.open{display:flex;}
+.counter-edit-panel{background:var(--s1);border:1px solid var(--bd2);border-radius:10px;width:100%;max-width:300px;display:flex;flex-direction:column;max-height:90vh;}
+.color-presets{display:flex;flex-wrap:wrap;gap:7px;padding:4px 0;}
+.color-swatch{width:30px;height:30px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0;}
+.color-swatch:hover{transform:scale(1.1);}
+.color-swatch.on{border-color:#fff;box-shadow:0 0 0 1px #fff;}
+.color-custom-wrap{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.color-custom-inp{width:36px;height:36px;border-radius:6px;cursor:pointer;border:2px solid var(--bd2);padding:2px;background:var(--s3);}
+/* MOBILE */
+@media(max-width:640px){
+  .desk-only{display:none!important;}
+  .topbar{height:52px;padding:0 10px;gap:6px;}
+  .brand-text{display:none;}
+  .topbtn{padding:4px 7px;font-size:.52rem;}
+  .gwrap{padding:5px;}
+  .grid{gap:5px;}
+  .searchbar{padding:5px 8px;gap:5px;}
+
+  /* Hide Menu on Mobile mode */
+  .mobile-clean .searchbar{display:none!important;}
+  .mobile-clean .tabbar .tab-add{display:none!important;}
+  .mobile-clean .gwrap{padding:3px;}
+  .mobile-clean .grid{gap:4px;}
+}
+
+/* EDIT MODE */
+.setbtn.edit-on{border-color:var(--ac);color:var(--ac);background:var(--adim);}
+.tab-edit-btn{width:18px;height:18px;border:none;background:rgba(56,189,248,.15);color:var(--ac);border-radius:3px;cursor:pointer;font-size:.55rem;display:inline-flex;align-items:center;justify-content:center;margin-left:3px;vertical-align:middle;transition:all .15s;}
+.tab-edit-btn:hover{background:var(--adim);}
+.tab-del-btn{width:18px;height:18px;border:none;background:rgba(239,68,68,.1);color:#ef4444;border-radius:3px;cursor:pointer;font-size:.55rem;display:inline-flex;align-items:center;justify-content:center;margin-left:2px;vertical-align:middle;transition:all .15s;}
+.tab-del-btn:hover{background:rgba(239,68,68,.25);}
+/* DRAG HANDLE */
+.drag-handle{position:absolute;top:3px;left:3px;width:26px;height:26px;display:none;align-items:center;justify-content:center;color:rgba(255,255,255,.85);font-size:1.1rem;cursor:grab;z-index:2;background:rgba(0,0,0,.65);border-radius:5px;}
+.drag-handle:active{cursor:grabbing;}
+.edit-mode .card .drag-handle{display:flex;}
+.sc-handle{position:absolute;top:3px;right:3px;width:26px;height:26px;display:none;align-items:center;justify-content:center;color:rgba(255,255,255,.85);font-size:.75rem;cursor:pointer;z-index:2;background:rgba(0,0,0,.65);border-radius:5px;}
+.sc-handle:hover{color:var(--ac);}
+.sc-mode .card .sc-handle{display:flex;}
+.card.drag-over{border-color:var(--ac)!important;box-shadow:0 0 0 2px var(--ac);}
+.card.dragging{opacity:.4;transform:scale(0.96);}
+/* COUNTER CARD PICKER */
+.counter-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;max-height:200px;overflow-y:auto;padding:2px;}
+.counter-picker-grid::-webkit-scrollbar{width:3px;}
+.counter-picker-grid::-webkit-scrollbar-thumb{background:var(--bd2);}
+.cpick-card{border:2px solid var(--bd2);border-radius:var(--rs);padding:10px 6px;cursor:pointer;text-align:center;transition:all .12s;background:var(--s3);}
+.cpick-card:hover{border-color:var(--ac2);background:var(--adim);}
+.cpick-card.on{border-color:var(--ac);background:var(--adim);box-shadow:0 0 0 1px var(--ac);}
+.cpick-card-name{font-size:.6rem;font-weight:700;color:var(--tx);word-break:break-word;line-height:1.3;}
+.cpick-card-icon{font-size:1.1rem;margin-bottom:4px;}
+.cpick-none{border:2px dashed var(--bd2);border-radius:var(--rs);padding:10px 6px;cursor:pointer;text-align:center;transition:all .12s;background:var(--s3);}
+.cpick-none:hover{border-color:var(--ac2);background:var(--adim);}
+.cpick-none.on{border-color:var(--tx3);background:rgba(255,255,255,.03);}
+.cpick-none-lbl{font-size:.56rem;color:var(--tx3);}
+/* COUNTER BUTTON IN DECK */
+.counter-btn-wrap{padding:8px 10px;background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;flex-wrap:wrap;gap:7px;flex-shrink:0;}
+.counter-btn{position:relative;background:var(--s2);border:1px solid var(--bd2);color:var(--tx);border-radius:var(--r);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:all .12s;user-select:none;-webkit-user-select:none;touch-action:none;overflow:hidden;box-sizing:border-box;}
+.counter-btn:active{transform:scale(0.95);}
+.counter-btn.holding-minus{border-color:#f59e0b;background:rgba(245,158,11,.08);}
+.counter-btn.holding-reset{border-color:#ef4444;background:rgba(239,68,68,.08);}
+.counter-btn-val{font-family:'Syne Mono',monospace;font-weight:900;color:var(--counter-color,var(--ac));line-height:1;text-shadow:0 0 20px color-mix(in srgb,var(--counter-color,var(--ac)) 40%,transparent);pointer-events:none;}
+.counter-btn-name{font-family:'Syne',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:0 4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx);pointer-events:none;}
+.counter-progress{position:absolute;bottom:0;left:0;height:3px;background:var(--counter-color,var(--ac));border-radius:0 0 var(--r) var(--r);width:0;transition:width linear;}
+.counter-progress.minus{background:#f59e0b;}
+.counter-progress.reset{background:#ef4444;}
+.counter-gear-btn{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.7);border:1px solid var(--bd2);color:var(--tx2);border-radius:5px;cursor:pointer;font-size:.7rem;display:none;align-items:center;justify-content:center;z-index:5;transition:all .15s;}
+.counter-gear-btn:hover{border-color:var(--ac);color:var(--ac);}
+.edit-mode-counters .counter-gear-btn, .sc-mode-counters .counter-gear-btn{display:flex;}
+
+
+/* ── SHORTCUT SYSTEM ──────────────────────────────────────────────────────── */
+/* Shortcut badge on cards */
+.card-shortcut-badge {
+  position:absolute;
+  bottom:6px; /* Naik dikit biar lega */
+  left:0;
+  right:0;
+  text-align:center;
+  font-family:'Inter', sans-serif; /* Ganti ke Inter */
+  font-size:.55rem;
+  font-weight: 800;
+  color:var(--ac);
+  background:rgba(0,0,0,.7);
+  padding:2px 4px;
+  letter-spacing:0;
+  pointer-events:none;
+  display:none;
+  text-transform: uppercase;
+}
+.show-shortcuts .card-shortcut-badge { display:block; }
+.show-shortcuts .card-label           { display:none; }
+
+/* Shortcut icon button in topbar (sebelah pencil) */
+.sc-mode-btn { position:relative; }
+.sc-mode-btn.active { border-color:var(--ac)!important; color:var(--ac)!important; background:rgba(56,189,248,.1)!important; }
+
+/* Shortcut Modal Overlay */
+.sc-overlay { position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center;padding:16px; }
+.sc-overlay.open { display:flex; }
+.sc-panel { background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:100%;max-width:360px;display:flex;flex-direction:column;max-height:90vh; }
+.sc-phd { padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+.sc-phd-title { 
+  font-size:.85rem; 
+  font-weight:800; 
+  font-family:'Inter', sans-serif; /* Ganti ke Inter */
+  letter-spacing: -0.3px; 
+}
+.sc-pbody { padding:14px 16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto; }
+.sc-pbody::-webkit-scrollbar{width:3px;}
+.sc-pbody::-webkit-scrollbar-thumb{background:var(--bd2);}
+.sc-for { font-size:.56rem;color:var(--tx2);margin-bottom:4px; }
+.sc-for b { color:var(--tx);font-weight:700; }
+
+/* Modifier row */
+.sc-mod-row { display:flex;gap:6px; }
+.sc-mod-btn {
+  flex:1;padding:6px 4px;border-radius:6px;font-size:.6rem;font-weight:700;
+  cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--tx2);
+  font-family:'Syne',sans-serif;transition:all .15s;text-align:center;
+}
+.sc-mod-btn.on { border-color:var(--ac);color:var(--ac);background:rgba(56,189,248,.1); }
+
+/* Key type tabs */
+.sc-key-tabs { display:flex;border-bottom:1px solid var(--bd);margin:0 -16px;padding:0 16px; }
+.sc-key-tab { padding:6px 12px;font-size:.58rem;font-weight:700;cursor:pointer;color:var(--tx2);border-bottom:2px solid transparent;transition:all .15s; }
+.sc-key-tab.on { color:var(--ac);border-bottom-color:var(--ac); }
+
+/* Key grid */
+.sc-key-grid { display:grid;gap:5px; }
+.sc-key-grid.alpha { grid-template-columns:repeat(7,1fr); }
+.sc-key-grid.num   { grid-template-columns:repeat(5,1fr); }
+.sc-key-grid.fn    { grid-template-columns:repeat(4,1fr); }
+.sc-key-btn {
+  padding:7px 2px;
+  border-radius:6px;
+  font-size:.65rem;
+  font-weight:700;
+  cursor:pointer;
+  border:1px solid var(--bd2);
+  background:transparent;
+  color:var(--tx2);
+  font-family:'Inter', sans-serif; /* Ganti ke Inter */
+  transition:all .15s;
+  text-align:center;
+}
+.sc-key-btn:hover { border-color:var(--ac);color:var(--ac); }
+.sc-key-btn.on { border-color:var(--ac);color:var(--ac);background:rgba(56,189,248,.15); }
+.sc-key-btn.used {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.05);
+}
+/* Preview + actions */
+.sc-preview { 
+  font-size:.7rem; 
+  color:var(--tx2); 
+  text-align:center; 
+  padding:10px; 
+  border-radius:8px; 
+  background:rgba(255,255,255,.03); 
+  border:1px solid var(--bd); 
+  min-height:36px; 
+  font-family:'Inter', sans-serif; /* Ganti ke Inter */
+  font-weight: 500;
+}
+.sc-preview b { 
+  color:var(--ac); 
+  font-size:.85rem; 
+  font-weight: 800; /* Bikin makin tegas kayak di dashboard */
+  letter-spacing: -0.5px;
+}
+.sc-actions { display:flex;gap:8px; }
+.sc-save-btn { flex:1;background:var(--ac);border:none;color:#000;padding:8px;border-radius:7px;font-size:.68rem;font-weight:800;cursor:pointer; }
+.sc-save-btn:hover { background:#7dd3fc; }
+.sc-clear-btn { background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444;padding:8px 12px;border-radius:7px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif; }
+.sc-clear-btn:hover { background:rgba(239,68,68,.2); }
+
+/* ── GLASSMORPHIC BACKGROUND ─────────────────────────────── */
+html,body{background:#070709!important;}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 90% 60% at 15% -10%,rgba(56,189,248,.13) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 110%,rgba(99,102,241,.09) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(56,189,248,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 25% at 80% 20%,rgba(239,68,68,.05) 0%,transparent 50%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+}
+.shell,.app,.main-wrap{position:relative;z-index:1;}
+#sidebar{
+  background:rgba(7,7,9,.72)!important;
+  backdrop-filter:blur(24px)!important;
+  -webkit-backdrop-filter:blur(24px)!important;
+  border-right:1px solid rgba(255,255,255,.06)!important;
+}
+.topbar,.app .topbar{
+  background:#0a0a10!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  border-bottom:1px solid rgba(255,255,255,.06)!important;
+}
+
+
+</style>
+</head>
+<body>
+<div class="shell">
+<div id="dmask" onclick="closeSidebar()"></div>
+<aside id="sidebar"></aside>
+
+<div class="main-wrap">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="burger" onclick="openSidebar()"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+    <a href="/" class="topbtn">HOME</a>
+    <a href="/customdeck.html" class="topbtn">CUSTOM</a>
+    <a href="/deck.html" class="topbtn tbtn-ac">DECK</a>
+    <div class="obs-wrap">
+      <button class="topbtn" onclick="toggleOBSMenu(event)" id="obs-menu-btn">OBS <svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="obs-dd" id="obs-dd">
+        <div class="obs-dd-item" onclick="window.open('/obs.html','_blank');closeOBSMenu()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open Overlay</div>
+        <div class="obs-dd-item" onclick="copyOBSUrl();closeOBSMenu()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy OBS URL</div>
+      </div>
+    </div>
+    <div class="sp"></div>
+    <div class="brand-text">KUROHIKO <span>STREAM KIT</span></div>
+    <div class="status-pill"><div class="sdot on"></div>RUNNING</div>
+  </div>
+
+  <div class="searchbar">
+    <input type="text" class="sbox" id="srch" placeholder="Search..." oninput="render()">
+    <button class="setbtn" onclick="toggleEditMode()" id="edit-mode-btn" title="Edit Mode">✏️</button>
+    <button class="setbtn sc-mode-btn" id="sc-mode-btn" onclick="toggleShortcutMode()" title="Shortcut Mode">⌨</button>
+    <button class="setbtn" onclick="openSettings()" title="Settings">⚙</button>
+  </div>
+
+  <div class="tabbar" id="tabbar"></div>
+  <div id="counter-btn-wrap" class="counter-btn-wrap" style="display:none;flex-wrap:wrap;gap:8px;"></div>
+  <div class="gwrap"><div class="grid" id="grid"></div></div>
+</div>
+</div>
+
+<!-- SETTINGS OVERLAY -->
+<div class="overlay" id="set-overlay">
+  <div class="panel set-panel">
+    <div class="phd">
+      <div class="phd-title">Deck Settings</div>
+      <button class="pclose" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="pbody">
+      <div>
+        <div class="fl">Grid Size</div>
+        <div class="gsz-wrap">
+          <div class="gsz-grid" id="gsz-grid"></div>
+          <div class="gsz-label" id="gsz-label">4 × 4</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Tab "All"</div>
+        <div class="toggle-row" onclick="toggleHideAll()">
+          <span>Hide "All" tab</span>
+          <div class="toggle" id="hide-all-toggle"></div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Mobile</div>
+        <div class="toggle-row" onclick="toggleHideMobileUI()">
+          <span>Hide menu on mobile</span>
+          <div class="toggle" id="hide-mobile-toggle"></div>
+        </div>
+        <div style="font-size:.52rem;color:var(--tx3);margin-top:5px;line-height:1.5;">Sembunyikan topbar, search, edit & settings saat diakses dari HP. Tahan 3 detik di area kosong untuk buka settings.</div>
+      </div>
+      <div id="shortcut-display-section">
+        <div class="fl">Shortcut Display</div>
+        <div class="toggle-row" onclick="toggleShowShortcuts()">
+          <span>Tampilkan shortcut di card</span>
+          <div class="toggle" id="show-shortcuts-toggle"></div>
+        </div>
+        <div style="font-size:.52rem;color:var(--tx3);margin-top:5px;line-height:1.5;">Saat aktif, nama meme disembunyikan dan shortcut key ditampilkan di bawah card.</div>
+      </div>
+      <div>
+        <div class="fl">Keyboard Shortcut</div>
+        <div class="toggle-row" id="deck-sc-toggle-row" onclick="toggleShortcutFromDeck()">
+          <span>Aktifkan keyboard shortcut</span>
+          <div class="toggle" id="deck-sc-toggle"></div>
+        </div>
+        <div style="font-size:.52rem;color:var(--tx3);margin-top:5px;line-height:1.5;">Matikan untuk menonaktifkan semua shortcut keyboard di seluruh aplikasi.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW/EDIT TAB OVERLAY -->
+<div class="overlay" id="tab-overlay">
+  <div class="panel tab-panel">
+    <div class="phd">
+      <div class="phd-title" id="tab-panel-title">New Tab</div>
+      <button class="pclose" onclick="closeTabPanel()">✕</button>
+    </div>
+    <div class="pbody">
+      <div>
+        <div class="fl">Tab Name (max 6 chars, emoji ok)</div>
+        <div class="tab-name-wrap">
+          <input type="text" class="tab-name-inp" id="tab-name-inp" placeholder="e.g. 😂kocak" maxlength="10" oninput="onTabNameInput()">
+          <span class="char-count" id="char-count">0/6</span>
+        </div>
+      </div>
+      <div id="tab-sc-section">
+        <div class="fl">Tab Shortcut <span style="font-size:.52rem;color:var(--tx3);font-weight:400;">(opsional)</span></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div id="tab-sc-preview" style="flex:1;font-size:.62rem;font-family:'Syne Mono',monospace;color:var(--tx2);background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;">Belum diatur</div>
+          <button onclick="openShortcutModal('tab', null)" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--ac);padding:6px 10px;border-radius:6px;font-size:.62rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">⌨ Set</button>
+          <button onclick="clearTabShortcut()" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#ef4444;padding:6px 8px;border-radius:6px;font-size:.62rem;cursor:pointer;" title="Clear">✕</button>
+        </div>
+      </div>
+      <div id="tab-counter-section">
+        <div class="fl">Counter (opsional)</div>
+        <div class="counter-picker-grid" id="tab-counter-picker"></div>
+        <div style="font-size:.58rem;color:var(--tx3);margin-top:4px;">Counter yang dipilih akan muncul sebagai tombol di deck view tab ini.</div>
+      </div>
+      <div>
+        <div class="fl">Select Memes</div>
+        <div class="meme-sel-grid" id="meme-sel-grid"></div>
+      </div>
+    </div>
+    <div class="pfooter" id="tab-footer">
+      <button class="bcnl" onclick="closeTabPanel()">Cancel</button>
+      <button class="bsave" onclick="saveTab()">Save Tab</button>
+    </div>
+  </div>
+</div>
+
+<!-- COUNTER EDIT OVERLAY -->
+<div class="counter-edit-overlay" id="counter-edit-overlay">
+  <div class="counter-edit-panel">
+    <div class="phd">
+      <div class="phd-title">Edit Counter</div>
+      <button class="pclose" onclick="closeCounterEdit()">✕</button>
+    </div>
+    <div class="pbody">
+      <div>
+        <div class="fl">Warna Counter</div>
+        <div class="color-presets" id="color-presets"></div>
+        <div class="color-custom-wrap">
+          <input type="color" class="color-custom-inp" id="color-custom-inp" value="#38bdf8" oninput="pickCustomColor(this.value)">
+          <span style="font-size:.65rem;color:var(--tx2);">Custom warna</span>
+          <span style="font-family:'Syne Mono',monospace;font-size:.6rem;color:var(--ac);" id="color-hex-display">#38bdf8</span>
+        </div>
+      </div>
+      <div id="counter-sc-section">
+        <div class="fl">Shortcut <span style="font-size:.52rem;color:var(--tx3);font-weight:400;">(opsional)</span></div>
+        
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+          <div style="width:40px;font-size:.6rem;color:var(--tx2);font-weight:700;">+1 (Tap)</div>
+          <div id="counter-sc-inc-preview" style="flex:1;font-size:.65rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--tx2);background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;">Belum diatur</div>
+          <button onclick="openShortcutModal('counter_inc', editingCounterFilename)" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--ac);padding:6px 10px;border-radius:6px;font-size:.62rem;font-weight:700;cursor:pointer;">⌨ Set</button>
+          <button onclick="clearCounterShortcut('inc')" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#ef4444;padding:6px 8px;border-radius:6px;font-size:.62rem;cursor:pointer;" title="Clear">✕</button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+          <div style="width:40px;font-size:.6rem;color:var(--tx2);font-weight:700;">-1 (Min)</div>
+          <div id="counter-sc-dec-preview" style="flex:1;font-size:.65rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--tx2);background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;">Belum diatur</div>
+          <button onclick="openShortcutModal('counter_dec', editingCounterFilename)" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--ac);padding:6px 10px;border-radius:6px;font-size:.62rem;font-weight:700;cursor:pointer;">⌨ Set</button>
+          <button onclick="clearCounterShortcut('dec')" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#ef4444;padding:6px 8px;border-radius:6px;font-size:.62rem;cursor:pointer;" title="Clear">✕</button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="width:40px;font-size:.6rem;color:var(--tx2);font-weight:700;">0 (Reset)</div>
+          <div id="counter-sc-res-preview" style="flex:1;font-size:.65rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--tx2);background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;">Belum diatur</div>
+          <button onclick="openShortcutModal('counter_res', editingCounterFilename)" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--ac);padding:6px 10px;border-radius:6px;font-size:.62rem;font-weight:700;cursor:pointer;">⌨ Set</button>
+          <button onclick="clearCounterShortcut('res')" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#ef4444;padding:6px 8px;border-radius:6px;font-size:.62rem;cursor:pointer;" title="Clear">✕</button>
+        </div>
+      </div>
+    </div>
+    <div class="pfooter">
+      <button class="bcnl" onclick="closeCounterEdit()">Cancel</button>
+      <button class="bsave" onclick="saveCounterEdit()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SHORTCUT MODAL -->
+<div class="sc-overlay" id="sc-overlay">
+  <div class="sc-panel">
+    <div class="sc-phd">
+      <div class="sc-phd-title">⌨ Set Shortcut</div>
+      <button class="pclose" onclick="closeShortcutModal()">✕</button>
+    </div>
+    <div class="sc-pbody">
+      <div class="sc-for">Shortcut untuk: <b id="sc-for-name">—</b></div>
+
+      <!-- Modifier keys -->
+      <div>
+        <div class="fl" style="margin-bottom:6px;">Modifier Key</div>
+        <div class="sc-mod-row">
+          <button class="sc-mod-btn" id="mod-ctrl"  onclick="toggleMod('Ctrl')">Ctrl</button>
+          <button class="sc-mod-btn" id="mod-alt"   onclick="toggleMod('Alt')">Alt</button>
+          <button class="sc-mod-btn" id="mod-shift" onclick="toggleMod('Shift')">Shift</button>
+        </div>
+      </div>
+
+      <!-- Key type tabs -->
+      <div>
+        <div class="fl" style="margin-bottom:6px;">Key</div>
+        <div class="sc-key-tabs">
+          <div class="sc-key-tab on" onclick="switchKeyTab('alpha',this)">A–Z</div>
+          <div class="sc-key-tab" onclick="switchKeyTab('num',this)">0–9</div>
+          <div class="sc-key-tab" onclick="switchKeyTab('fn',this)">F1–F24</div>
+        </div>
+        <div style="padding-top:10px;">
+          <div class="sc-key-grid alpha" id="sc-key-grid"></div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="sc-preview" id="sc-preview">Pilih modifier + key</div>
+
+      <!-- Actions -->
+      <div class="sc-actions">
+        <button class="sc-clear-btn" onclick="clearShortcutModal()">✕ Clear</button>
+        <button class="sc-save-btn" onclick="saveShortcutModal()">Simpan Shortcut</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/ksk-ui.js"></script>
+<script>
+const socket = io();
+socket.on('connect',    () => { document.querySelectorAll('.status-pill .sdot').forEach(d => d.classList.add('on')); });
+socket.on('disconnect', () => { document.querySelectorAll('.status-pill .sdot').forEach(d => d.classList.remove('on')); });
+
+// Dengarkan toggle shortcut dari index.html (BroadcastChannel)
+try {
+  const _kskChannel = new BroadcastChannel('ksk');
+  _kskChannel.onmessage = (e) => {
+    if (e.data && e.data.type === 'shortcuts_toggle') {
+      // Re-register shortcut ke OS sesuai state baru
+      // (keydown handler sudah auto-check localStorage, tapi Electron global shortcut perlu di-update manual)
+      updateGlobalKeyListeners();
+      applyShortcutVisibility();
+      if (typeof toast === 'function') toast(e.data.enabled ? '⌨ Shortcut aktif' : '⌨ Shortcut dimatikan');
+    }
+  };
+} catch {}
+
+// ─── OBS DROPDOWN ───────────────────────────────────────
+let obsUrl = location.protocol + '//' + location.hostname + ':' + location.port + '/obs.html';
+(async()=>{
+  try{
+    const r=await fetch('/api/local-ip');
+    const d=await r.json();
+    obsUrl='http://'+d.ip+':'+d.port+'/obs.html';
+  }catch{}
+})();
+function toggleOBSMenu(e) {
+  e.stopPropagation();
+  document.getElementById('obs-dd').classList.toggle('open');
+}
+function closeOBSMenu() {
+  document.getElementById('obs-dd').classList.remove('open');
+}
+function copyOBSUrl() {
+  navigator.clipboard.writeText(obsUrl).then(() => {
+    const btn = document.getElementById('obs-menu-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    btn.style.borderColor = 'var(--gn)';
+    btn.style.color = 'var(--gn)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
+  }).catch(() => {});
+}
+document.addEventListener('click', () => closeOBSMenu());
+
+// ─── STATE ───────────────────────────────────────────────
+let files = [], active = null, lastSig = '';
+let curTab = 'all'; // 'all' or tab id
+let editingTabId = null;
+
+let settings = defSettings();
+let settingsSaveTimer = null;
+function defSettings() {
+  return { cols: 4, rows: 4, hideAll: false, hideMobileUI: false, showShortcuts: false, tabs: [], counterColors: {}, shortcuts: {}, counterShortcuts: {}, tabShortcuts: {} };
+}
+async function loadSettingsFromServer() {
+  try {
+    const r = await fetch('/api/deck-settings');
+    const data = await r.json();
+    if (data && typeof data === 'object') {
+      settings = { ...defSettings(), ...data };
+    }
+  } catch {}
+  updateGlobalKeyListeners();
+}
+function saveSettings() {
+  clearTimeout(settingsSaveTimer);
+  settingsSaveTimer = setTimeout(() => {
+    fetch('/api/deck-settings', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(settings)
+    }).catch(() => {});
+  }, 300);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────
+function getType(n) {
+  const e = n.split('.').pop().toLowerCase();
+  if (['jpg','jpeg','png','gif','webp'].includes(e)) return 'image';
+  if (['mp4','webm','mov'].includes(e)) return 'video';
+  return 'audio';
+}
+function getLabel(f) { return (f.settings && f.settings.displayName) || f.name; }
+function getThumb(f) {
+  const t = getType(f.name);
+  if (t === 'image') return '/assets/' + encodeURIComponent(f.name);
+  if (t === 'video') {
+    const td = f.settings && f.settings.thumbnailData;
+    return td || '/api/thumb/' + encodeURIComponent(f.name);
+  }
+  return null;
+}
+
+// ─── LOAD FILES ──────────────────────────────────────────
+async function loadFiles() {
+  try { const r = await fetch('/api/media'); files = await r.json(); } catch { files = []; }
+  const sig = files.map(f => f.name + (f.settings ? (f.settings.displayName||'')+(f.settings.thumbnailData?'1':'0') : '0')).join('|');
+  if (sig !== lastSig) { lastSig = sig; renderTabs(); render(); return; }
+  // Just update active highlights
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('act', c.dataset.nm === active));
+}
+
+// ─── TABS ────────────────────────────────────────────────
+let editMode = false;
+
+function toggleEditMode() {
+  editMode = !editMode;
+  
+  // Matiin mode shortcut kalau mode edit dinyalain
+  if (editMode && scMode) toggleShortcutMode(); 
+
+  const icon = editMode ? '💾' : '✏️';
+  document.getElementById('edit-mode-btn').classList.toggle('edit-on', editMode);
+  document.getElementById('edit-mode-btn').textContent = icon;
+  document.getElementById('grid').classList.toggle('edit-mode', editMode);
+  document.getElementById('counter-btn-wrap').classList.toggle('edit-mode-counters', editMode);
+  
+  // Munculin Editor bar (Merah)
+  const bar = document.getElementById('editor-bar');
+  if(bar) bar.style.display = editMode ? 'flex' : 'none';
+  
+  // Kasih jarak bawah biar meme nggak ketutupan bar
+  const gwrap = document.querySelector('.gwrap');
+  if(gwrap) gwrap.style.paddingBottom = (editMode || scMode) ? '56px' : '8px';
+  
+  renderTabs();
+  render();
+}
+
+function exitEditorMode() { if (editMode) toggleEditMode(); }
+
+function renderTabs() {
+  const bar = document.getElementById('tabbar');
+  const tabs = settings.tabs || [];
+  const hideAll = settings.hideAll;
+  let html = '';
+
+  if (!hideAll) {
+    html += `<div class="tab${curTab==='all'?' on':''}" onclick="switchTab('all')">All</div>`;
+  } else if (curTab === 'all' && tabs.length) {
+    curTab = tabs[0].id;
+  }
+
+  tabs.forEach(t => {
+    // Tampilkan tombol Gear ⚙️ kalau di mode Edit ATAU mode Shortcut
+    if (editMode || scMode) {
+      html += `<div class="tab${curTab===t.id?' on':''}" onclick="switchTab('${t.id}')">
+        ${t.name}
+        <button class="tab-edit-btn" onclick="event.stopPropagation();openEditTab('${t.id}')" title="Edit tab">⚙</button>
+        ${editMode ? `<button class="tab-del-btn" onclick="event.stopPropagation();deleteTab('${t.id}')" title="Hapus tab">✕</button>` : ''}
+      </div>`;
+    } else {
+      html += `<div class="tab${curTab===t.id?' on':''}" onclick="switchTab('${t.id}')">${t.name}</div>`;
+    }
+  });
+
+  html += `<div class="tab-add" onclick="openNewTab()" title="New tab">＋</div>`;
+  bar.innerHTML = html;
+}
+
+function switchTab(id) {
+  curTab = id;
+  renderTabs();
+  render();
+  updateCounterDisplay();
+}
+
+// ─── GRID RENDER ─────────────────────────────────────────
+function render() {
+  applyGridSize();
+  const q = document.getElementById('srch').value.toLowerCase();
+  // Apply global order if set
+  let fs = [...files];
+  if (curTab === 'all' && settings.globalOrder && settings.globalOrder.length) {
+    fs.sort((a, b) => {
+      const ai = settings.globalOrder.indexOf(a.name);
+      const bi = settings.globalOrder.indexOf(b.name);
+      if (ai < 0 && bi < 0) return 0;
+      if (ai < 0) return 1;
+      if (bi < 0) return -1;
+      return ai - bi;
+    });
+  }
+
+// Filter by tab
+  if (curTab !== 'all') {
+    const tab = (settings.tabs || []).find(t => t.id === curTab);
+    if (tab) {
+      // HANYA tampilkan item yang dipilih saat bikin tab, sesuai urutannya
+      fs = tab.items.map(name => fs.find(f => f.name === name)).filter(Boolean);
+    } else {
+      fs = [];
+    }
+  }
+
+  // Filter by search
+  if (q) fs = fs.filter(f => getLabel(f).toLowerCase().includes(q) || f.name.toLowerCase().includes(q));
+
+  const g = document.getElementById('grid');
+  if (!fs.length) { g.innerHTML = '<div class="empty">No memes here.<br>Add some to this tab!</div>'; return; }
+
+  g.innerHTML = fs.map(f => {
+    const nm = f.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const label = getLabel(f);
+    const isAct = f.name === active, hasCfg = !!f.settings;
+    const t = getType(f.name);
+    const thumb = getThumb(f);
+
+    let media;
+    if (t === 'audio') {
+      const s = f.settings || {};
+      if(s.audioThumbMode==='image' && s.audioThumbImg){
+        media = `<img src="${s.audioThumbImg}" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+      } else if(s.audioThumbMode==='text' && s.audioThumbText){
+        media = `<div class="vaudio"><div class="vaudio-ic" style="font-size:2rem;">${s.audioThumbText.replace(/</g,'&lt;')}</div></div>`;
+      } else {
+        media = `<div class="vaudio"><div class="vaudio-ic">🎵</div><div class="vaudio-nm">${label}</div></div>`;
+      }
+    } else {
+      media = `<img src="${thumb}" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"
+        onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'vaudio',innerHTML:'<div class=vaudio-ic>${t==='video'?'🎬':'🖼'}</div><div class=vaudio-nm>${label.replace(/'/g,"&#39;")}</div>'}));">`;
+    }
+
+    const sc = (settings.shortcuts || {})[f.name];
+    const scText = sc ? formatShortcut(sc) : '';
+    return `<div class="card${isAct?' act':''}${hasCfg?'':' nc'}" onclick="editMode?null:scMode?openShortcutModal('card','${nm}'):trigger('${nm}')" data-nm="${nm}"
+      draggable="${editMode?'true':'false'}"
+      ondragstart="dragStart(event,'${nm}')"
+      ondragend="dragEnd(event)"
+      ondragover="dragOver(event)"
+      ondragleave="dragLeave(event)"
+      ondrop="dropOn(event,'${nm}')">
+      <div class="drag-handle" title="Geser untuk atur urutan">⠿</div>
+      <div class="sc-handle" title="Set Shortcut">⌨</div>
+      <div class="clive">● LIVE</div>${media}
+      <div class="card-label clbl">${label}</div>
+      <div class="card-shortcut-badge">${scText}</div></div>`;
+  }).join('');
+  // Apply edit-mode class to grid
+  document.getElementById('grid').classList.toggle('edit-mode', editMode);
+}
+
+function applyGridSize() {
+  const cols = settings.cols || 4;
+  document.getElementById('grid').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+}
+
+// ─── DRAG & DROP (Edit Mode) ─────────────────────────────
+let dragSrcName = null;
+
+function dragStart(e, name) {
+  if (!editMode) { e.preventDefault(); return; }
+  dragSrcName = name;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', name);
+  setTimeout(() => {
+    const el = document.querySelector(`.card[data-nm="${CSS.escape(name)}"]`);
+    if(el) el.classList.add('dragging');
+  }, 0);
+}
+
+function dragEnd(e) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging', 'drag-over'));
+}
+
+function dragOver(e) {
+  if (!editMode) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function dropOn(e, targetName) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('drag-over', 'dragging'));
+  if (!dragSrcName || dragSrcName === targetName) { dragSrcName = null; return; }
+
+  if (curTab !== 'all') {
+    // Reorder items in tab — work from current visible card order in DOM
+    const tab = (settings.tabs||[]).find(t => t.id === curTab);
+    if (!tab) { dragSrcName = null; return; }
+
+    // Get current order from DOM cards
+    const currentOrder = Array.from(document.querySelectorAll('.card[data-nm]')).map(c => c.dataset.nm);
+    const si = currentOrder.indexOf(dragSrcName);
+    const ti = currentOrder.indexOf(targetName);
+    if (si < 0 || ti < 0) { dragSrcName = null; return; }
+
+    // Build new order
+    currentOrder.splice(si, 1);
+    currentOrder.splice(ti, 0, dragSrcName);
+
+    // Merge: keep new order for items in tab, preserve any extras at end
+    const tabSet = new Set(tab.items);
+    const extras = currentOrder.filter(n => !tabSet.has(n));
+    const reordered = currentOrder.filter(n => tabSet.has(n));
+    tab.items = [...reordered, ...extras];
+    saveSettings();
+  } else {
+    // Reorder global files array (in-memory, persisted via globalOrder)
+    const si = files.findIndex(f => f.name === dragSrcName);
+    const ti = files.findIndex(f => f.name === targetName);
+    if (si < 0 || ti < 0) { dragSrcName = null; return; }
+    const [moved] = files.splice(si, 1);
+    files.splice(ti, 0, moved);
+    settings.globalOrder = files.map(f => f.name);
+    saveSettings();
+  }
+  dragSrcName = null;
+  // Force re-render without reloading from server
+  lastSig = '';
+  render();
+}
+
+// ─── TRIGGER ─────────────────────────────────────────────
+async function trigger(name) {
+  const f = files.find(x => x.name === name); if (!f) return;
+  active = name;
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('act', c.dataset.nm === active));
+  await fetch('/trigger', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ filename: name, ...(f.settings || {}) }) });
+}
+
+// ─── SETTINGS PANEL ──────────────────────────────────────
+function openSettings() {
+  buildGszGrid();
+  updateToggle();
+  applyShortcutVisibility();
+  document.getElementById('set-overlay').classList.add('open');
+}
+function closeSettings() { document.getElementById('set-overlay').classList.remove('open'); }
+
+// Grid size picker — Excel style
+let hoverCols = settings.cols || 4, hoverRows = settings.rows || 4;
+function buildGszGrid() {
+  const g = document.getElementById('gsz-grid');
+  let html = '';
+  for (let r = 1; r <= 6; r++) {
+    for (let c = 1; c <= 8; c++) {
+      html += `<div class="gsz-cell${(r<=(settings.rows||4)&&c<=(settings.cols||4))?' hover':''}"
+        data-r="${r}" data-c="${c}"
+        onmouseover="hoverGsz(${r},${c})"
+        onmouseleave="leaveGsz()"
+        onclick="pickGsz(${r},${c})"></div>`;
+    }
+  }
+  g.innerHTML = html;
+  document.getElementById('gsz-label').textContent = `${settings.cols||4} × ${settings.rows||4}`;
+}
+function hoverGsz(r, c) {
+  document.querySelectorAll('.gsz-cell').forEach(el => {
+    el.classList.toggle('hover', +el.dataset.r <= r && +el.dataset.c <= c);
+  });
+  document.getElementById('gsz-label').textContent = `${c} × ${r}`;
+}
+function leaveGsz() {
+  document.querySelectorAll('.gsz-cell').forEach(el => {
+    el.classList.toggle('hover', +el.dataset.r <= (settings.rows||4) && +el.dataset.c <= (settings.cols||4));
+  });
+  document.getElementById('gsz-label').textContent = `${settings.cols||4} × ${settings.rows||4}`;
+}
+function pickGsz(r, c) {
+  settings.cols = c; settings.rows = r;
+  saveSettings(); buildGszGrid(); applyGridSize(); updateCounterDisplay();
+}
+
+function toggleHideAll() {
+  settings.hideAll = !settings.hideAll;
+  if (settings.hideAll && curTab === 'all') {
+    const tabs = settings.tabs || [];
+    curTab = tabs.length ? tabs[0].id : 'all';
+  }
+  saveSettings(); updateToggle(); renderTabs(); render();
+}
+function toggleHideMobileUI() {
+  settings.hideMobileUI = !settings.hideMobileUI;
+  saveSettings(); updateToggle(); applyMobileClean();
+}
+function applyMobileClean() {
+  const mw = document.querySelector('.main-wrap');
+  if (settings.hideMobileUI) {
+    mw.classList.add('mobile-clean');
+  } else {
+    mw.classList.remove('mobile-clean');
+  }
+}
+function updateToggle() {
+  document.getElementById('hide-all-toggle').classList.toggle('on', !!settings.hideAll);
+  document.getElementById('hide-mobile-toggle').classList.toggle('on', !!settings.hideMobileUI);
+  document.getElementById('show-shortcuts-toggle').classList.toggle('on', !!settings.showShortcuts);
+  document.getElementById('grid').classList.toggle('show-shortcuts', !!settings.showShortcuts);
+}
+
+// ─── SHORTCUT VISIBILITY & SYNC ─────────────────────────
+function isShortcutEnabled() {
+  return localStorage.getItem('shortcuts_enabled') !== 'false';
+}
+
+function applyShortcutVisibility() {
+  const enabled = isShortcutEnabled();
+
+  // Tombol ⌨ di searchbar
+  const scBtn = document.getElementById('sc-mode-btn');
+  if (scBtn) scBtn.style.display = enabled ? '' : 'none';
+
+  // Shortcut section di counter edit
+  const csc = document.getElementById('counter-sc-section');
+  if (csc) csc.style.display = enabled ? '' : 'none';
+
+  // Shortcut section di tab panel
+  const tsc = document.getElementById('tab-sc-section');
+  if (tsc) tsc.style.display = enabled ? '' : 'none';
+
+  // Shortcut Display di settings
+  const dsc = document.getElementById('shortcut-display-section');
+  if (dsc) dsc.style.display = enabled ? '' : 'none';
+
+  // Toggle di settings gear
+  const deckToggle = document.getElementById('deck-sc-toggle');
+  if (deckToggle) deckToggle.classList.toggle('on', enabled);
+}
+
+function toggleShortcutFromDeck() {
+  const newVal = !isShortcutEnabled();
+  localStorage.setItem('shortcuts_enabled', String(newVal));
+  applyShortcutVisibility();
+  updateGlobalKeyListeners();
+  // Sync ke tab lain
+  try { new BroadcastChannel('ksk').postMessage({ type: 'shortcuts_toggle', enabled: newVal }); } catch {}
+  // Sync ke Electron tray
+  try { if (window.kskElectron && window.kskElectron.setShortcutEnabled) window.kskElectron.setShortcutEnabled(newVal); } catch {}
+  if (typeof toast === 'function') toast(newVal ? '⌨ Shortcut aktif' : '⌨ Shortcut dimatikan');
+}
+
+// ─── TAB PANEL ───────────────────────────────────────────
+let selectedCounters = []; // array of filenames
+function populateTabCounterSel(selectedVals) {
+  selectedCounters = Array.isArray(selectedVals) ? [...selectedVals] : (selectedVals ? [selectedVals] : []);
+  const picker = document.getElementById('tab-counter-picker');
+  if (!picker) return;
+  let html = counters.map(c => {
+    const isSel = selectedCounters.includes(c.filename);
+    const color = (settings.counterColors && settings.counterColors[c.filename]) || '#38bdf8';
+    const fn = c.filename.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="cpick-card${isSel?' on':''}" onclick="toggleCounterSel('${fn}')" style="${isSel?`border-color:${color};background:color-mix(in srgb,${color} 15%,transparent);`:''}">
+      <div class="cpick-card-icon" style="${isSel?`color:${color}`:''}">🔢</div>
+      <div class="cpick-card-name">${c.name}</div>
+    </div>`;
+  }).join('');
+  if (!html) html = '<div style="font-size:.65rem;color:var(--tx3);padding:8px;text-align:center;">Belum ada counter. Buat dulu di Dashboard.</div>';
+  picker.innerHTML = html;
+}
+function toggleCounterSel(filename) {
+  const idx = selectedCounters.indexOf(filename);
+  if (idx >= 0) selectedCounters.splice(idx, 1);
+  else selectedCounters.push(filename);
+  populateTabCounterSel(selectedCounters);
+}
+
+function openNewTab() {
+  editingTabId = null;
+  document.getElementById('tab-panel-title').textContent = 'New Tab';
+  document.getElementById('tab-name-inp').value = '';
+  document.getElementById('char-count').textContent = '0/6';
+  populateTabCounterSel([]);
+  renderMemeSel([]);
+  document.getElementById('tab-footer').innerHTML =
+    `<button class="bcnl" onclick="closeTabPanel()">Cancel</button>
+     <button class="bsave" onclick="saveTab()">Save Tab</button>`;
+  _editingTabShortcut = null;
+  updateTabScPreview();
+  document.getElementById('tab-overlay').classList.add('open');
+}
+
+function openEditTab(id) {
+  const tab = (settings.tabs||[]).find(t => t.id === id);
+  if (!tab) return;
+  editingTabId = id;
+  document.getElementById('tab-panel-title').textContent = 'Edit Tab';
+  document.getElementById('tab-name-inp').value = tab.name;
+  onTabNameInput();
+  populateTabCounterSel(tab.counters || (tab.counter ? [tab.counter] : []));
+  renderMemeSel(tab.items || []);
+  document.getElementById('tab-footer').innerHTML =
+    `<button class="bdel" onclick="deleteTab('${id}')">Delete</button>
+     <div style="flex:1"></div>
+     <button class="bcnl" onclick="closeTabPanel()">Cancel</button>
+     <button class="bsave" onclick="saveTab()">Save</button>`;
+  _editingTabShortcut = (settings.tabShortcuts || {})[id] || null;
+  updateTabScPreview();
+  document.getElementById('tab-overlay').classList.add('open');
+}
+
+function closeTabPanel() { document.getElementById('tab-overlay').classList.remove('open'); editingTabId = null; }
+
+function onTabNameInput() {
+  const inp = document.getElementById('tab-name-inp');
+  // Count display chars (emoji = 1 char visually but multiple codepoints)
+  const visual = [...inp.value]; // spread splits into grapheme clusters
+  const count = visual.length;
+  if (count > 6) inp.value = visual.slice(0,6).join('');
+  document.getElementById('char-count').textContent = Math.min(count,6)+'/6';
+}
+
+function renderMemeSel(selected) {
+  const g = document.getElementById('meme-sel-grid');
+  g.innerHTML = files.map(f => {
+    const nm = f.name;
+    const label = getLabel(f);
+    const t = getType(nm);
+    const thumb = getThumb(f);
+    const isSel = selected.includes(nm);
+    const nm_esc = nm.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+    let media;
+    if (t === 'audio') {
+      media = `<div class="saudio"><span>🎵</span><small>${label}</small></div>`;
+    } else {
+      media = `<img src="${thumb}" loading="lazy" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"
+        onerror="this.style.display='none'">`;
+    }
+
+    return `<div class="sel-card${isSel?' on':''}" onclick="toggleSel(this,'${nm_esc}')">
+      ${media}
+      <div class="sel-check">✓</div>
+      <div class="sel-card-lbl">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSel(el, name) {
+  el.classList.toggle('on');
+}
+
+function saveTab() {
+  const name = document.getElementById('tab-name-inp').value.trim();
+  if (!name) { document.getElementById('tab-name-inp').focus(); return; }
+  const selected = Array.from(document.querySelectorAll('.sel-card.on'))
+    .map(el => {
+      // get name from the onclick attr
+      const onc = el.getAttribute('onclick');
+      const m = onc.match(/toggleSel\(this,'(.+?)'\)/);
+      return m ? m[1].replace(/\\'/g,"'").replace(/\\\\/g,'\\') : null;
+    }).filter(Boolean);
+
+  const countersArr = [...selectedCounters];
+
+  if (!settings.tabs) settings.tabs = [];
+  if (editingTabId) {
+    const idx = settings.tabs.findIndex(t => t.id === editingTabId);
+    if (idx >= 0) settings.tabs[idx] = { id: editingTabId, name, items: selected, counters: countersArr, counter: countersArr[0] || null };
+  } else {
+    const id = 'tab_' + Date.now();
+    settings.tabs.push({ id, name, items: selected, counters: countersArr, counter: countersArr[0] || null });
+    curTab = id;
+  }
+  // Save tab shortcut
+  if (!settings.tabShortcuts) settings.tabShortcuts = {};
+  const tabId = editingTabId || ('tab_' + Date.now());
+  if (_editingTabShortcut) settings.tabShortcuts[editingTabId || tabId] = _editingTabShortcut;
+  else delete settings.tabShortcuts[editingTabId || tabId];
+
+  saveSettings(); closeTabPanel(); renderTabs(); render(); updateCounterDisplay();
+  updateGlobalKeyListeners();
+}
+
+function deleteTab(id) {
+  if (!confirm('Delete this tab?')) return;
+  settings.tabs = (settings.tabs||[]).filter(t => t.id !== id);
+  if (curTab === id) curTab = settings.hideAll ? (settings.tabs[0]?.id||'all') : 'all';
+  saveSettings(); closeTabPanel(); renderTabs(); render();
+}
+
+// Close overlays on backdrop click
+document.getElementById('set-overlay').addEventListener('click', e => { if(e.target===document.getElementById('set-overlay')) closeSettings(); });
+document.getElementById('tab-overlay').addEventListener('click', e => { if(e.target===document.getElementById('tab-overlay')) closeTabPanel(); });
+
+// ─── COUNTERS ────────────────────────────────────────────
+let counters = [];
+let counterPollTimer = null;
+let counterHoldTimer = null;
+let counterHoldStart_t = null;
+let counterHoldAnimFrame = null;
+let counterHoldActive = false;
+
+async function loadCounters() {
+  try {
+    const r = await fetch('/api/counters');
+    counters = await r.json();
+  } catch { counters = []; }
+  // Re-render picker if open
+  const picker = document.getElementById('tab-counter-picker');
+  if (picker && picker.children.length > 0) {
+    populateTabCounterSel(selectedCounterVal);
+  }
+}
+
+function getTabCounters(tabId) {
+  if (tabId === 'all') return [];
+  const tab = (settings.tabs||[]).find(t => t.id === tabId);
+  if (!tab) return [];
+  const list = tab.counters || (tab.counter ? [tab.counter] : []);
+  return list.map(fn => counters.find(c => c.filename === fn)).filter(Boolean);
+}
+function getTabCounter(tabId) {
+  const arr = getTabCounters(tabId);
+  return arr[0] || null;
+}
+
+function applyCounterColor(btnEl, filename) {
+  const color = (settings.counterColors && settings.counterColors[filename]) || null;
+  if (color) {
+    btnEl.style.setProperty('--counter-color', color);
+    btnEl.classList.add('color-custom');
+  } else {
+    btnEl.style.removeProperty('--counter-color');
+    btnEl.classList.remove('color-custom');
+  }
+}
+
+function updateCounterDisplay() {
+  const counterList = getTabCounters(curTab);
+  const wrap = document.getElementById('counter-btn-wrap');
+  clearInterval(counterPollTimer);
+  counterPollTimer = null;
+
+  if (!counterList.length) {
+    wrap.style.display = 'none';
+    wrap.innerHTML = '';
+    return;
+  }
+
+  wrap.style.display = 'flex';
+  wrap.style.flexWrap = 'wrap';
+
+  // Compute card size — wait for gwrap to have width
+  const cols = settings.cols || 4;
+  const gwrap = document.querySelector('.gwrap');
+  const gwrapW = gwrap ? gwrap.clientWidth : 0;
+  const gapPx = 7;
+  const cardSize = Math.max(70, Math.floor(((gwrapW || 320) - 20 - gapPx * (cols - 1)) / cols));
+  const valFontSize = Math.round(cardSize * 0.32);
+  const nameFontSize = Math.max(9, Math.round(cardSize * 0.1));
+
+  // Build counter buttons — use div (not button) as outer to avoid nested-button HTML issue
+  wrap.innerHTML = counterList.map((counter, i) => {
+    const color = (settings.counterColors && settings.counterColors[counter.filename]) || '#38bdf8';
+    const fn = counter.filename.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="counter-btn" id="counter-btn-${i}"
+      style="--counter-color:${color};width:${cardSize}px;height:${cardSize}px;"
+      data-filename="${counter.filename}" data-idx="${i}"
+      onmousedown="counterHoldStart(event,${i})"
+      onmouseup="counterHoldEnd(event,${i})"
+      onmouseleave="counterHoldCancel(${i})"
+      ontouchstart="counterHoldStart(event,${i})"
+      ontouchend="counterHoldEnd(event,${i})"
+      ontouchcancel="counterHoldCancel(${i})">
+      <div class="counter-gear-btn" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation();openCounterEdit('${fn}')" title="Edit warna">⚙</div>
+      <div class="counter-btn-val" id="counter-btn-val-${i}" style="font-size:${valFontSize}px">0</div>
+      <div class="counter-btn-name" id="counter-btn-name-${i}" style="font-size:${nameFontSize}px">${counter.name}</div>
+      <div class="counter-progress" id="counter-progress-${i}"></div>
+    </div>`;
+  }).join('');
+
+  // Fetch values
+  counterList.forEach((counter, i) => fetchAndShowCounterVal(counter.filename, i));
+  counterPollTimer = setInterval(() => {
+    const cl = getTabCounters(curTab);
+    cl.forEach((c, i) => fetchAndShowCounterVal(c.filename, i));
+  }, 2000);
+}
+
+async function fetchAndShowCounterVal(filename, idx=0) {
+  try {
+    const r = await fetch('/api/counters/' + encodeURIComponent(filename) + '/value');
+    const d = await r.json();
+    const el = document.getElementById('counter-btn-val-' + idx);
+    if (el) el.textContent = d.value ?? '0';
+  } catch {}
+}
+
+async function setCounterVal(filename, val, idx=0) {
+  await fetch('/api/counters/' + encodeURIComponent(filename) + '/value', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ value: String(val) })
+  });
+  const el = document.getElementById('counter-btn-val-' + idx);
+  if (el) el.textContent = String(val);
+}
+
+async function incrementCounter(idx=0) {
+  const counterList = getTabCounters(curTab);
+  const counter = counterList[idx];
+  if (!counter) return;
+  try {
+    const r = await fetch('/api/counters/' + encodeURIComponent(counter.filename) + '/op', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ op: 'inc' })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      const el = document.getElementById('counter-btn-val-' + idx);
+      if (el) el.textContent = String(d.value);
+    }
+  } catch {}
+}
+
+// Update display instan saat server emit counter-updated (dari shortcut keyboard)
+socket.on('counter-updated', (data) => {
+  if (!data || !data.filename) return;
+  const counterList = getTabCounters(curTab);
+  for (let i = 0; i < counterList.length; i++) {
+    if (counterList[i].filename === data.filename) {
+      const el = document.getElementById('counter-btn-val-' + i);
+      if (el) el.textContent = String(data.value);
+    }
+  }
+});
+
+function counterHoldStart(e, idx=0) {
+  e.preventDefault();
+  counterHoldActive = true;
+  counterHoldStart_t = Date.now();
+  const progress = document.getElementById('counter-progress-' + idx);
+  const btn = document.getElementById('counter-btn-' + idx);
+  if (!progress || !btn) return;
+  progress.style.transition = 'none';
+  progress.style.width = '0%';
+  progress.className = 'counter-progress';
+
+  function animate() {
+    if (!counterHoldActive) return;
+    const elapsed = Date.now() - counterHoldStart_t;
+    if (elapsed < 3000) {
+      const pct = (elapsed / 3000) * 100;
+      progress.style.width = pct + '%';
+      if (elapsed > 500) {
+        progress.className = 'counter-progress minus';
+        btn.classList.add('holding-minus');
+        btn.classList.remove('holding-reset');
+      }
+    } else if (elapsed < 5000) {
+      const pct = 33.3 + ((elapsed - 3000) / 2000) * 66.7;
+      progress.style.width = Math.min(pct, 100) + '%';
+      progress.className = 'counter-progress reset';
+      btn.classList.remove('holding-minus');
+      btn.classList.add('holding-reset');
+    } else {
+      progress.style.width = '100%';
+    }
+    counterHoldAnimFrame = requestAnimationFrame(animate);
+  }
+  counterHoldAnimFrame = requestAnimationFrame(animate);
+}
+
+async function counterHoldEnd(e, idx=0) {
+  if (!counterHoldActive) return;
+  counterHoldActive = false;
+  cancelAnimationFrame(counterHoldAnimFrame);
+  const elapsed = Date.now() - (counterHoldStart_t || Date.now());
+  const btn = document.getElementById('counter-btn-' + idx);
+  const progress = document.getElementById('counter-progress-' + idx);
+  if (btn) { btn.classList.remove('holding-minus','holding-reset'); }
+  if (progress) { progress.style.width = '0%'; progress.className = 'counter-progress'; }
+
+  const counterList = getTabCounters(curTab);
+  const counter = counterList[idx];
+  if (!counter) return;
+
+  if (elapsed >= 5000) {
+    const rr = await fetch('/api/counters/' + encodeURIComponent(counter.filename) + '/op', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ op: 'reset' })
+    });
+    const dr = await rr.json();
+    if (dr.ok) { const el = document.getElementById('counter-btn-val-' + idx); if (el) el.textContent = String(dr.value); }
+  } else if (elapsed >= 3000) {
+    const rd = await fetch('/api/counters/' + encodeURIComponent(counter.filename) + '/op', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ op: 'dec' })
+    });
+    const dd = await rd.json();
+    if (dd.ok) { const el = document.getElementById('counter-btn-val-' + idx); if (el) el.textContent = String(dd.value); }
+  } else {
+    await incrementCounter(idx);
+  }
+}
+
+function counterHoldCancel(idx=0) {
+  if (!counterHoldActive) return;
+  counterHoldActive = false;
+  cancelAnimationFrame(counterHoldAnimFrame);
+  const btn = document.getElementById('counter-btn-' + idx);
+  const progress = document.getElementById('counter-progress-' + idx);
+  if (btn) btn.classList.remove('holding-minus','holding-reset');
+  if (progress) { progress.style.width = '0%'; progress.className = 'counter-progress'; }
+}
+
+// ─── COUNTER COLOR EDIT ──────────────────────────────────
+const COLOR_PRESETS = [
+  {color:'#38bdf8', name:'Sky Blue'},
+  {color:'#22c55e', name:'Green'},
+  {color:'#ef4444', name:'Red'},
+  {color:'#f59e0b', name:'Amber'},
+  {color:'#f97316', name:'Orange'},
+  {color:'#a855f7', name:'Purple'},
+  {color:'#ec4899', name:'Pink'},
+  {color:'#14b8a6', name:'Teal'},
+  {color:'#e2e8f0', name:'White'},
+  {color:'#fbbf24', name:'Gold'},
+  {color:'#34d399', name:'Emerald'},
+  {color:'#fb7185', name:'Rose'},
+];
+
+let editingCounterFilename = null;
+let currentPickerColor = '#38bdf8';
+
+function openCounterEdit(filename) {
+  editingCounterFilename = filename;
+  currentPickerColor = (settings.counterColors && settings.counterColors[filename]) || '#38bdf8';
+  document.getElementById('color-custom-inp').value = currentPickerColor;
+  document.getElementById('color-hex-display').textContent = currentPickerColor;
+  renderColorPresets();
+  document.getElementById('counter-edit-overlay').classList.add('open');
+}
+
+function closeCounterEdit() {
+  document.getElementById('counter-edit-overlay').classList.remove('open');
+  editingCounterFilename = null;
+}
+
+function renderColorPresets() {
+  const el = document.getElementById('color-presets');
+  el.innerHTML = COLOR_PRESETS.map(p => `
+    <div class="color-swatch${p.color.toLowerCase()===currentPickerColor.toLowerCase()?' on':''}"
+      style="background:${p.color}"
+      title="${p.name}"
+      onclick="pickPresetColor('${p.color}')">
+    </div>`).join('');
+}
+
+function pickPresetColor(color) {
+  currentPickerColor = color;
+  document.getElementById('color-custom-inp').value = color;
+  document.getElementById('color-hex-display').textContent = color;
+  renderColorPresets();
+}
+
+function pickCustomColor(color) {
+  currentPickerColor = color;
+  document.getElementById('color-hex-display').textContent = color;
+  renderColorPresets();
+}
+
+function saveCounterEdit() {
+  if (!editingCounterFilename) return;
+  if (!settings.counterColors) settings.counterColors = {};
+  settings.counterColors[editingCounterFilename] = currentPickerColor;
+  saveSettings();
+  closeCounterEdit();
+  updateCounterDisplay();
+}
+
+document.getElementById('counter-edit-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('counter-edit-overlay')) closeCounterEdit();
+});
+
+// ─── INIT ────────────────────────────────────────────────
+(async () => {
+  await loadSettingsFromServer();
+  applyGridSize();
+  applyMobileClean();
+  applyShortcutVisibility();
+  await loadCounters();
+  loadFiles();
+  // Update counter sizes once layout is ready
+  requestAnimationFrame(() => { requestAnimationFrame(() => updateCounterDisplay()); });
+  setInterval(loadFiles, 4000);
+  // Re-calc counter sizes on window resize
+  window.addEventListener('resize', () => updateCounterDisplay());
+  // Listen for settings changes from other devices
+  // Dengarkan toggle dari tray Electron
+  if (window.kskElectron && window.kskElectron.onShortcutStateChanged) {
+    window.kskElectron.onShortcutStateChanged((enabled) => {
+      localStorage.setItem('shortcuts_enabled', String(enabled));
+      applyShortcutVisibility();
+      updateGlobalKeyListeners();
+      if (typeof toast === 'function') toast(enabled ? '⌨ Shortcut aktif' : '⌨ Shortcut dimatikan');
+    });
+  }
+
+  socket.on('deck-settings-updated', (data) => {
+    const wasTab = curTab;
+    settings = { ...defSettings(), ...data };
+    if (!settings.tabs.find(t => t.id === wasTab)) {
+      curTab = settings.hideAll ? (settings.tabs[0]?.id || 'all') : 'all';
+    }
+    renderTabs();
+    render();
+    applyMobileClean();
+    updateCounterDisplay();
+  });
+})();
+
+// ─── LONG-PRESS TO OPEN SETTINGS (mobile clean mode) ────
+let _lpTimer = null;
+document.querySelector('.gwrap').addEventListener('touchstart', (e) => {
+  if (!settings.hideMobileUI) return;
+  if (e.target.closest('.card') || e.target.closest('.counter-btn')) return;
+  _lpTimer = setTimeout(() => { openSettings(); }, 3000);
+}, { passive: true });
+document.querySelector('.gwrap').addEventListener('touchend', () => { clearTimeout(_lpTimer); });
+document.querySelector('.gwrap').addEventListener('touchmove', () => { clearTimeout(_lpTimer); });
+
+// Init KSK sidebar
+KSK.init('deck');
+
+// ─── Shortcut mode toggle (Fungsi yang tadi hilang) ─────────────────────────────
+function toggleShortcutMode() {
+  scMode = !scMode;
+  
+  // Matiin mode edit kalau mode shortcut dinyalain
+  if (scMode && editMode) toggleEditMode(); 
+  
+  const scBtn = document.getElementById('sc-mode-btn');
+  const grid = document.getElementById('grid');
+  const scBar = document.getElementById('shortcut-bar');
+  const gwrap = document.querySelector('.gwrap');
+
+  if(scBtn) scBtn.classList.toggle('active', scMode);
+  if(grid) grid.classList.toggle('sc-mode', scMode);
+  
+  // Munculin Shortcut bar (Biru)
+  if(scBar) scBar.style.display = scMode ? 'flex' : 'none';
+  
+  // Kasih jarak bawah biar meme nggak ketutupan bar
+  if(gwrap) gwrap.style.paddingBottom = (editMode || scMode) ? '56px' : '8px';
+  
+  // Tampilkan tombol Gear di Counter
+  const counterWrap = document.getElementById('counter-btn-wrap');
+  if(counterWrap) counterWrap.classList.toggle('sc-mode-counters', scMode);
+  
+  renderTabs();
+}
+</script>
+
+<script>
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('dmask').classList.add('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('dmask').classList.remove('open');}
+
+async function clearThumbCache() {
+  try {
+    // Delete all cached thumbs by clearing the thumbnail folder via server
+    // We'll just reload all images (force re-fetch by busting img src cache)
+    const imgs = document.querySelectorAll('.card img, .sel-card img');
+    imgs.forEach(img => {
+      const src = img.src.split('?')[0];
+      img.src = src + '?t=' + Date.now();
+    });
+    closeSidebar();
+    alert('Thumbnail cache cleared!');
+  } catch(e) { alert('Gagal clear cache'); }
+}
+
+// Mobile detection
+function applyMobileMode(){
+  const mob = window.innerWidth <= 640;
+  document.querySelectorAll('.desk-only').forEach(el=>el.style.display=mob?'none':'');
+}
+applyMobileMode();
+window.addEventListener('resize', applyMobileMode);
+
+// Socket status is now handled via .status-pill .sdot in main script block
+
+// ─── WAKE LOCK (layar HP ga mati) ────────────────────────
+let wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return; // browser ga support, skip aja
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+  } catch {}
+}
+// Request wake lock pas halaman dibuka
+requestWakeLock();
+// Re-request kalau tab balik ke foreground (wake lock otomatis lepas kalau tab hidden)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') requestWakeLock();
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SHORTCUT SYSTEM
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let scMode = false;
+let _scContext  = null;  
+let _scTarget   = null;  
+let _scMods     = { Ctrl: false, Alt: false, Shift: false };
+let _scKey      = null;
+let _scKeyType  = 'alpha';
+let _editingTabShortcut = null;
+
+// ─── Format shortcut to readable string ─────────────────────────────────────
+function formatShortcut(sc) {
+  if (!sc || !sc.key) return '';
+  const mods = [sc.ctrl?'Ctrl':'', sc.alt?'Alt':'', sc.shift?'Shift':''].filter(Boolean);
+  return [...mods, sc.key].join('+');
+}
+
+function toggleShowShortcuts() {
+  settings.showShortcuts = !settings.showShortcuts;
+  saveSettings(); updateToggle(); render();
+}
+
+// ─── Open shortcut modal ─────────────────────────────────────────────────────
+function openShortcutModal(context, target) {
+  _scContext = context; _scTarget = target;
+  _scMods = { Ctrl: false, Alt: false, Shift: false }; _scKey = null;
+
+  let existing = null;
+  if (context === 'card') existing = (settings.shortcuts || {})[target];
+  if (context === 'counter_inc') existing = (settings.counterShortcuts || {})[target];
+  if (context === 'counter_dec') existing = (settings.counterDecShortcuts || {})[target];
+  if (context === 'counter_res') existing = (settings.counterResShortcuts || {})[target];
+  if (context === 'tab')  existing = _editingTabShortcut;
+
+  if (existing) {
+    _scMods.Ctrl = !!existing.ctrl; _scMods.Alt = !!existing.alt; _scMods.Shift = !!existing.shift;
+    _scKey = existing.key || null;
+    if (_scKey && _scKey.startsWith('F')) _scKeyType = 'fn';
+    else if (_scKey && /^\d$/.test(_scKey)) _scKeyType = 'num';
+    else _scKeyType = 'alpha';
+  }
+
+  let label = target || context;
+  if (context === 'card') label = getLabel(files.find(x => x.name === target)) || target;
+  if (context.startsWith('counter')) {
+    const act = context.split('_')[1];
+    const cName = target ? target.replace(/\.[^/.]+$/, '') : 'Counter';
+    label = `${cName} (${act === 'inc' ? '+1' : act === 'dec' ? '-1' : 'Reset'})`;
+  }
+  if (context === 'tab') label = (settings.tabs || []).find(t => t.id === target)?.name || 'Tab';
+  
+  document.getElementById('sc-for-name').textContent = label;
+  _scKeyType = _scKeyType || 'alpha';
+  
+  document.querySelectorAll('.sc-key-tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.sc-key-tab').forEach(t => {
+    if (t.textContent.includes(_scKeyType === 'alpha' ? 'A' : _scKeyType === 'num' ? '0' : 'F')) t.classList.add('on');
+  });
+
+  updateScModUI(); renderScKeyGrid(_scKeyType); updateScPreview();
+  document.getElementById('sc-overlay').classList.add('open');
+}
+
+function closeShortcutModal() { document.getElementById('sc-overlay').classList.remove('open'); }
+
+// ─── Modifier & Key Grid ─────────────────────────────────────────────────────
+function toggleMod(mod) { _scMods[mod] = !_scMods[mod]; updateScModUI(); updateScPreview(); }
+function updateScModUI() {
+  document.getElementById('mod-ctrl').classList.toggle('on', !!_scMods.Ctrl);
+  document.getElementById('mod-alt').classList.toggle('on', !!_scMods.Alt);
+  document.getElementById('mod-shift').classList.toggle('on', !!_scMods.Shift);
+}
+function switchKeyTab(type, el) {
+  _scKeyType = type; _scKey = null;
+  document.querySelectorAll('.sc-key-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderScKeyGrid(type); updateScPreview();
+}
+function renderScKeyGrid(type) {
+  const grid = document.getElementById('sc-key-grid');
+  let keys = [];
+  if (type === 'alpha') {
+    keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    grid.className = 'sc-key-grid alpha';
+  } else if (type === 'num') {
+    keys = ['0','1','2','3','4','5','6','7','8','9','NumPad0','NumPad1','NumPad2','NumPad3','NumPad4','NumPad5','NumPad6','NumPad7','NumPad8','NumPad9'];
+    grid.className = 'sc-key-grid num';
+  } else {
+    keys = Array.from({length:24}, (_,i) => 'F'+(i+1));
+    grid.className = 'sc-key-grid fn';
+  }
+
+  grid.innerHTML = keys.map(k => {
+    const isUsed = checkShortcutInUse(k);
+    const usedClass = isUsed ? ' used' : '';
+    const activeClass = _scKey === k ? ' on' : '';
+    return `<button class="sc-key-btn${usedClass}${activeClass}" onclick="selectKey('${k}')">${k}</button>`;
+  }).join('');
+}
+// Fungsi untuk mengecek apakah kombinasi tombol sudah dipakai
+function checkShortcutInUse(k) {
+  const combo = (_scMods.Ctrl?'Ctrl+':'') + (_scMods.Alt?'Alt+':'') + (_scMods.Shift?'Shift+':'') + k;
+  const fmt = (sc) => (sc.ctrl?'Ctrl+':'') + (sc.alt?'Alt+':'') + (sc.shift?'Shift+':'') + sc.key;
+
+  // Cek di Shortcuts Meme
+  for (const [fn, sc] of Object.entries(settings.shortcuts || {})) {
+    if (fn !== _scTarget && fmt(sc) === combo) return getLabel(files.find(f => f.name === fn)) || fn;
+  }
+  // Cek di Shortcuts Counter
+  const cGroups = { inc: settings.counterShortcuts, dec: settings.counterDecShortcuts, res: settings.counterResShortcuts };
+  for (const [type, group] of Object.entries(cGroups)) {
+    for (const [fn, sc] of Object.entries(group || {})) {
+      if (fmt(sc) === combo) return `${fn.replace('.txt','')} (${type === 'inc' ? '+1' : type === 'dec' ? '-1' : 'Reset'})`;
+    }
+  }
+  // Cek di Shortcuts Tab
+  for (const [tabId, sc] of Object.entries(settings.tabShortcuts || {})) {
+    if (tabId !== editingTabId && fmt(sc) === combo) {
+      const tab = settings.tabs.find(t => t.id === tabId);
+      return `Tab: ${tab ? tab.name : tabId}`;
+    }
+  }
+  return null;
+}
+function selectKey(k) { _scKey = _scKey === k ? null : k; renderScKeyGrid(_scKeyType); updateScPreview(); }
+
+function updateScPreview() {
+  const el = document.getElementById('sc-preview');
+  const mods = [_scMods.Ctrl?'Ctrl':'', _scMods.Alt?'Alt':'', _scMods.Shift?'Shift':''].filter(Boolean);
+  
+  if (!_scKey && !mods.length) {
+    el.innerHTML = '<span style="color:var(--tx3)">Pilih modifier + key</span>';
+    return;
+  }
+
+  const comboStr = [...mods, _scKey || '?'].join('+');
+  let html = `<b>${comboStr}</b>`;
+
+  if (_scKey) {
+    const owner = checkShortcutInUse(_scKey);
+    if (owner) {
+      html += `<div style="color:#ef4444; font-size:.6rem; margin-top:4px; font-weight:700;">
+        ⚠️ Terhubung ke: ${owner}
+      </div>`;
+    }
+  }
+  
+  el.innerHTML = html;
+}
+
+function clearShortcutModal() {
+  _scMods = { Ctrl: false, Alt: false, Shift: false }; _scKey = null;
+  updateScModUI(); renderScKeyGrid(_scKeyType); updateScPreview();
+}
+
+function saveShortcutModal() {
+  if (!_scKey) { toast('Pilih key terlebih dahulu'); return; }
+  const sc = { key: _scKey, ctrl: _scMods.Ctrl, alt: _scMods.Alt, shift: _scMods.Shift };
+
+  if (_scContext === 'card') {
+    if (!settings.shortcuts) settings.shortcuts = {};
+    settings.shortcuts[_scTarget] = sc;
+    saveSettings(); render();
+  } else if (_scContext.startsWith('counter_')) {
+    const act = _scContext.split('_')[1];
+    if (act === 'inc') {
+      if (!settings.counterShortcuts) settings.counterShortcuts = {};
+      settings.counterShortcuts[_scTarget] = sc;
+      document.getElementById('counter-sc-inc-preview').textContent = formatShortcut(sc);
+    } else if (act === 'dec') {
+      if (!settings.counterDecShortcuts) settings.counterDecShortcuts = {};
+      settings.counterDecShortcuts[_scTarget] = sc;
+      document.getElementById('counter-sc-dec-preview').textContent = formatShortcut(sc);
+    } else if (act === 'res') {
+      if (!settings.counterResShortcuts) settings.counterResShortcuts = {};
+      settings.counterResShortcuts[_scTarget] = sc;
+      document.getElementById('counter-sc-res-preview').textContent = formatShortcut(sc);
+    }
+    saveSettings();
+  } else if (_scContext === 'tab') {
+    _editingTabShortcut = sc; updateTabScPreview();
+  }
+
+  closeShortcutModal(); updateGlobalKeyListeners();
+  toast('Shortcut disimpan: ' + formatShortcut(sc));
+}
+
+function updateTabScPreview() {
+  const el = document.getElementById('tab-sc-preview');
+  if (el) el.textContent = _editingTabShortcut ? formatShortcut(_editingTabShortcut) : 'Belum diatur';
+}
+function clearTabShortcut() { _editingTabShortcut = null; updateTabScPreview(); }
+
+// ─── CLEAR COUNTER SHORTCUTS ─────────────────────────────────────────────────
+function clearCounterShortcut(type) {
+  if (!editingCounterFilename) return;
+  if (type === 'inc' && settings.counterShortcuts) {
+    delete settings.counterShortcuts[editingCounterFilename];
+    document.getElementById('counter-sc-inc-preview').textContent = 'Belum diatur';
+  }
+  if (type === 'dec' && settings.counterDecShortcuts) {
+    delete settings.counterDecShortcuts[editingCounterFilename];
+    document.getElementById('counter-sc-dec-preview').textContent = 'Belum diatur';
+  }
+  if (type === 'res' && settings.counterResShortcuts) {
+    delete settings.counterResShortcuts[editingCounterFilename];
+    document.getElementById('counter-sc-res-preview').textContent = 'Belum diatur';
+  }
+  saveSettings(); updateGlobalKeyListeners();
+}
+
+// ─── GLOBAL KEYBOARD LISTENERS & ELECTRON SYNC ───────────────────────────────
+function updateGlobalKeyListeners() {
+  if (window._scKeyHandler) document.removeEventListener('keydown', window._scKeyHandler);
+
+  window._scKeyHandler = function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    // Cek apakah shortcut diaktifkan
+    if (localStorage.getItem('shortcuts_enabled') === 'false') return;
+    const pressed = (e.ctrlKey ? 'Ctrl+' : '') + (e.altKey ? 'Alt+' : '') + (e.shiftKey ? 'Shift+' : '') + e.key.toUpperCase();
+    const fmt = (sc) => (sc.ctrl?'Ctrl+':'') + (sc.alt?'Alt+':'') + (sc.shift?'Shift+':'') + sc.key;
+
+    for (const [fn, sc] of Object.entries(settings.shortcuts || {})) {
+      if (pressed === fmt(sc)) { e.preventDefault(); trigger(fn); return; }
+    }
+    for (const [fn, sc] of Object.entries(settings.counterShortcuts || {})) {
+      if (pressed === fmt(sc)) { e.preventDefault(); triggerCounterAction(fn, 'inc'); return; }
+    }
+    for (const [fn, sc] of Object.entries(settings.counterDecShortcuts || {})) {
+      if (pressed === fmt(sc)) { e.preventDefault(); triggerCounterAction(fn, 'dec'); return; }
+    }
+    for (const [fn, sc] of Object.entries(settings.counterResShortcuts || {})) {
+      if (pressed === fmt(sc)) { e.preventDefault(); triggerCounterAction(fn, 'res'); return; }
+    }
+    for (const [tabId, sc] of Object.entries(settings.tabShortcuts || {})) {
+      if (pressed === fmt(sc)) { e.preventDefault(); switchTab(tabId); return; }
+    }
+  };
+  document.addEventListener('keydown', window._scKeyHandler);
+
+  // Daftarin shortcut ke OS via main.js
+  if (window.kskElectron && window.kskElectron.registerShortcuts) {
+    const scEnabled = localStorage.getItem('shortcuts_enabled') !== 'false';
+    if (!scEnabled) {
+      // Shortcut dimatikan — unregister semua dari OS
+      window.kskElectron.registerShortcuts([]);
+    } else {
+      let globalSc = [];
+      const mapSc = (sc) => (sc.ctrl?'CommandOrControl+':'')+(sc.alt?'Alt+':'')+(sc.shift?'Shift+':'')+sc.key;
+      
+      for (const [fn, sc] of Object.entries(settings.shortcuts || {})) globalSc.push({ combo: mapSc(sc), action: { type: 'card', target: fn } });
+      for (const [fn, sc] of Object.entries(settings.counterShortcuts || {})) globalSc.push({ combo: mapSc(sc), action: { type: 'counter_inc', target: fn } });
+      for (const [fn, sc] of Object.entries(settings.counterDecShortcuts || {})) globalSc.push({ combo: mapSc(sc), action: { type: 'counter_dec', target: fn } });
+      for (const [fn, sc] of Object.entries(settings.counterResShortcuts || {})) globalSc.push({ combo: mapSc(sc), action: { type: 'counter_res', target: fn } });
+      for (const [tabId, sc] of Object.entries(settings.tabShortcuts || {})) globalSc.push({ combo: mapSc(sc), action: { type: 'tab', target: tabId } });
+
+      window.kskElectron.registerShortcuts(globalSc);
+    }
+  }
+}
+
+// ─── EXECUTE COUNTER ACTION (+1, -1, 0) ──────────────────────────────────────
+async function triggerCounterAction(filename, action) {
+  try {
+    // Pakai /op agar atomic - server baca file, hitung, tulis, emit socket
+    const opMap = { inc: 'inc', dec: 'dec', res: 'reset' };
+    const r = await fetch('/api/counters/' + encodeURIComponent(filename) + '/op', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ op: opMap[action] || action })
+    });
+    const d = await r.json();
+    if (!d.ok) return;
+    // Update UI dari response langsung (socket juga update, tapi ini lebih cepat)
+    const counterList = getTabCounters(curTab);
+    const idx = counterList.findIndex(c => c.filename === filename);
+    if (idx >= 0) {
+      const el = document.getElementById('counter-btn-val-' + idx);
+      if (el) el.textContent = String(d.value);
+      const btn = document.getElementById('counter-btn-' + idx);
+      if (btn) { btn.style.transform = 'scale(0.9)'; setTimeout(() => btn.style.transform = '', 100); }
+    }
+  } catch (e) { console.error('triggerCounterAction:', e); }
+}
+
+// ─── Update counter shortcut preview when opening counter edit ───────────────
+const _origOpenCounterEdit = openCounterEdit;
+openCounterEdit = function(filename) {
+  _origOpenCounterEdit(filename);
+  const scInc = (settings.counterShortcuts || {})[filename];
+  const scDec = (settings.counterDecShortcuts || {})[filename];
+  const scRes = (settings.counterResShortcuts || {})[filename];
+  
+  const elInc = document.getElementById('counter-sc-inc-preview');
+  const elDec = document.getElementById('counter-sc-dec-preview');
+  const elRes = document.getElementById('counter-sc-res-preview');
+  
+  if (elInc) elInc.textContent = scInc ? formatShortcut(scInc) : 'Belum diatur';
+  if (elDec) elDec.textContent = scDec ? formatShortcut(scDec) : 'Belum diatur';
+  if (elRes) elRes.textContent = scRes ? formatShortcut(scRes) : 'Belum diatur';
+};
+
+// ─── Init on load ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(updateGlobalKeyListeners, 1000); 
+
+  // Pakai kskElectron karena itu yang ada di preload lo
+  if (window.kskElectron && window.kskElectron.onShortcutTriggered && !window._globalScInit) {
+    window._globalScInit = true;
+    window.kskElectron.onShortcutTriggered((action) => {
+      // Cek toggle — kalau dimatikan, abaikan semua shortcut dari OS
+      if (localStorage.getItem('shortcuts_enabled') === 'false') return;
+      if (action.type === 'card') trigger(action.target);
+      else if (action.type && action.type.startsWith('counter_')) {
+          const act = action.type.split('_')[1];
+          triggerCounterAction(action.target, act);
+      }
+      else if (action.type === 'tab') switchTab(action.target);
+    });
+  }
+});
+
+</script>
+
+<!-- EDITOR MODE BAR -->
+<div id="editor-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:linear-gradient(90deg,rgba(9,9,13,.96) 0%,rgba(17,17,24,.98) 100%);
+  border-top:1px solid rgba(239,68,68,.3);
+  padding:0 16px;height:44px;
+  display:none;align-items:center;gap:12px;
+  box-shadow:0 -4px 24px rgba(239,68,68,.12);">
+  <!-- left: mode label -->
+  <div style="display:flex;align-items:center;gap:8px;flex:1;">
+    <div style="width:6px;height:6px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;animation:edpulse 1.5s infinite;"></div>
+    <span style="font-size:.6rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#ef4444;font-family:'Syne',sans-serif;">EDITOR MODE</span>
+    <span style="font-size:.58rem;color:var(--tx3);font-family:'Syne',sans-serif;">— drag card untuk ubah urutan · klik card untuk rename/edit tab</span>
+  </div>
+  <!-- right: done button -->
+  <button onclick="exitEditorMode()" style="
+    background:rgba(239,68,68,.12);
+    border:1px solid rgba(239,68,68,.4);
+    color:#ef4444;
+    padding:6px 18px;
+    border-radius:7px;
+    font-size:.65rem;font-weight:800;
+    font-family:'Syne',sans-serif;
+    letter-spacing:1px;
+    cursor:pointer;
+    transition:all .15s;
+    white-space:nowrap;
+    flex-shrink:0;"
+    onmouseover="this.style.background='rgba(239,68,68,.25)'"
+    onmouseout="this.style.background='rgba(239,68,68,.12)'">
+    ✓ DONE
+  </button>
+</div>
+<style>
+@keyframes edpulse{0%,100%{opacity:1;box-shadow:0 0 8px #ef4444}50%{opacity:.5;box-shadow:0 0 4px #ef4444}}
+</style>
+<div id="shortcut-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:linear-gradient(90deg,rgba(9,9,13,.96) 0%,rgba(17,17,24,.98) 100%);
+  border-top:1px solid rgba(56,189,248,.3);
+  padding:0 16px;height:44px;
+  display:none;align-items:center;gap:12px;
+  box-shadow:0 -4px 24px rgba(56,189,248,.12);">
+  <div style="display:flex;align-items:center;gap:8px;flex:1;">
+    <div style="width:6px;height:6px;border-radius:50%;background:#38bdf8;box-shadow:0 0 8px #38bdf8;animation:scpulse 1.5s infinite;"></div>
+    <span style="font-size:.6rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#38bdf8;font-family:'Syne',sans-serif;">SHORTCUT MODE</span>
+    <span style="font-size:.58rem;color:var(--tx3);font-family:'Syne',sans-serif;">— klik icon ⌨️ di card, atau gear ⚙️ di counter/tab untuk set shortcut</span>
+  </div>
+  <button onclick="toggleShortcutMode()" style="
+    background:rgba(56,189,248,.12);
+    border:1px solid rgba(56,189,248,.4);
+    color:#38bdf8;
+    padding:6px 18px;
+    border-radius:7px;
+    font-size:.65rem;font-weight:800;
+    font-family:'Syne',sans-serif;
+    letter-spacing:1px;
+    cursor:pointer;
+    transition:all .15s;
+    white-space:nowrap;
+    flex-shrink:0;"
+    onmouseover="this.style.background='rgba(56,189,248,.25)'"
+    onmouseout="this.style.background='rgba(56,189,248,.12)'">
+    ✓ DONE
+  </button>
+</div>
+<style>
+@keyframes scpulse{0%,100%{opacity:1;box-shadow:0 0 8px #38bdf8}50%{opacity:.5;box-shadow:0 0 4px #38bdf8}}
+</style>
+</body>
+</html>
