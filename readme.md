@@ -60,12 +60,13 @@ Karena folder `node_modules` tidak disertakan di repository ini, ikuti langkah b
 
 ## ☕ Support the Project
 Kalau mau support project ini bisa dengan bantu gw perbaiki kodingnya 🤣
-atau TopUp di Toko gw. ini gw yang urus yak.
+TopUp di Toko gw. ini gw yang urus yak.
 👉 **[KurohikoTopUp.com](https://KurohikoTopUp.com)**
 
 ---
 
 ## 🤝 Kontribusi & Masukan
 Kalau lu nemu bug atau ide buat fitur baru, bisa chat gw aja, atau buka *Issue*. Ingaet, ini project santai, jadi responnya mungkin nggak secepet itu, tapi pasti gue baca!
+
 
 **Dibuat dengan ❤️ oleh Kurohiko. dengan Vibe Coding**
