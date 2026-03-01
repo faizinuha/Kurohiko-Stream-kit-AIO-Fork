@@ -101,6 +101,7 @@ function createWindow() {
     },
     show: false,
   });
+  
 
   const tryLoad = (attempts = 0) => {
     const http = require('http');

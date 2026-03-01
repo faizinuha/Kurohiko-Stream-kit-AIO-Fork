@@ -375,9 +375,9 @@ body::after{
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="/socket.io/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/ksk-ui.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <script>
 const socket = io();
 
@@ -496,7 +496,10 @@ function openConnect(){
   }
 }
 function closeConnect(){document.getElementById('connect-modal').classList.remove('open');}
-document.getElementById('connect-modal').addEventListener('click',e=>{if(e.target===document.getElementById('connect-modal'))closeConnect();});
+// Pakai optional chaining (?.) supaya kalau ID-nya nggak ada, app nggak crash
+document.getElementById('phone-connect-modal')?.addEventListener('click', e => {
+  if(e.target === document.getElementById('phone-connect-modal')) closeConnect();
+});
 
 // ─── KD COUNTER ──────────────────────────────────────────
 async function loadKDCounters() {
@@ -514,16 +517,75 @@ function renderKDList(counters) {
     el.innerHTML = '<div style="font-size:.68rem;color:var(--tx3);text-align:center;padding:14px;">Belum ada counter. Buat yang pertama!</div>';
     return;
   }
-  el.innerHTML = counters.map(c => `
+  el.innerHTML = counters.map(c => {
+    // Escape path untuk keperluan atribut onclick
+    const fullPath = `assets/text/${c.filename}`;
+    const fn_esc = escAttr(c.filename);
+
+    return `
     <div style="display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;">
       <div style="width:7px;height:7px;border-radius:50%;background:var(--gn);flex-shrink:0;box-shadow:0 0 5px var(--gn);"></div>
       <div style="flex:1;">
         <div style="font-size:.72rem;font-weight:700;">${escHtml(c.name)}</div>
-        <div style="font-size:.55rem;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-top:2px;">/assets/text/${escHtml(c.filename)}</div>
+        <div style="font-size:.55rem;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-top:2px;">${fullPath}</div>
       </div>
-      <button onclick="openCounterFolder('${escAttr(c.filename)}')" title="Buka lokasi file" style="background:rgba(56,189,248,.08);border:1px solid var(--ac);color:var(--ac);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Buka folder">📂</button>
-      <button onclick="deleteKDCounter('${escAttr(c.filename)}')" title="Hapus" style="background:rgba(239,68,68,.08);border:1px solid #ef4444;color:#ef4444;width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
-    </div>`).join('');
+      <button onclick="copyCounterPath('${fn_esc}')" title="Copy Full Path" style="background:rgba(56,189,248,.08);border:1px solid var(--ac);color:var(--ac);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">📋</button>
+      
+      <button onclick="openCounterFolder('${fn_esc}')" title="Buka lokasi file" style="background:rgba(56,189,248,.08);border:1px solid var(--ac);color:var(--ac);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">📂</button>
+      
+      <button onclick="deleteKDCounter('${fn_esc}')" title="Hapus" style="background:rgba(239,68,68,.08);border:1px solid #ef4444;color:#ef4444;width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// Tambahkan fungsi pendukung ini di bawahnya
+async function copyCounterPath(filename) {
+  try {
+    // Kita ambil base path dari server supaya path-nya absolut (C:\Users\...)
+    const r = await fetch('/api/config');
+    const cfg = await r.json();
+    
+    // Logika penentuan path (sama kyk di server.js/paths.js)
+    const base = cfg.assetsDir || 'AppData/Roaming/Kurohiko Stream kit AIO/assets';
+    const fullPath = `${base}/text/${filename}`;
+    
+    if(navigator.clipboard) {
+      await navigator.clipboard.writeText(fullPath);
+      toast('Path copied to clipboard!');
+    } else {
+      throw new Error();
+    }
+  } catch(e) {
+    // Fallback kalau API gagal, kasih path relatif aja
+    const relPath = `assets/text/${filename}`;
+    const t=document.createElement('textarea');t.value=relPath;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);
+    toast('Relative path copied!');
+  }
+}
+
+// Tambahkan fungsi pendukung ini di bawahnya
+async function copyCounterPath(filename) {
+  try {
+    // Kita ambil base path dari server supaya path-nya absolut (C:\Users\...)
+    const r = await fetch('/api/config');
+    const cfg = await r.json();
+    
+    // Logika penentuan path (sama kyk di server.js/paths.js)
+    const base = cfg.assetsDir || 'AppData/Roaming/Kurohiko Stream kit AIO/assets';
+    const fullPath = `${base}/text/${filename}`;
+    
+    if(navigator.clipboard) {
+      await navigator.clipboard.writeText(fullPath);
+      toast('Path copied to clipboard!');
+    } else {
+      throw new Error();
+    }
+  } catch(e) {
+    // Fallback kalau API gagal, kasih path relatif aja
+    const relPath = `assets/text/${filename}`;
+    const t=document.createElement('textarea');t.value=relPath;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);
+    toast('Relative path copied!');
+  }
 }
 
 function renderActiveCounters(counters) {
@@ -704,7 +766,13 @@ async function doRestore(file) {
 <script>
 function openOnboarding() { document.getElementById('ob-modal').classList.add('open'); }
 function closeOnboarding() { document.getElementById('ob-modal').classList.remove('open'); }
-document.getElementById('ob-modal').addEventListener('click', function(e) { if(e.target===this) closeOnboarding(); });
+// Pakai pengecekan 'if' biar script di bawahnya gak ikut mati kalau modal ga ada
+const obModal = document.getElementById('ob-modal');
+if (obModal) {
+  obModal.addEventListener('click', function(e) { 
+    if(e.target === this) closeOnboarding(); 
+  });
+}
 
 function openShortcutSetup() {
   const modalHtml = `
