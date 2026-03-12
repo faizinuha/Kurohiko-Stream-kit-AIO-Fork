@@ -1,0 +1,7 @@
+node_modules/
+dist/
+dist/win-unpacked/
+assets*/
+deck_settings.json/
+meta.json/
+stats.json/

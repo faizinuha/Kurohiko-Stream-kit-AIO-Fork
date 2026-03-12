@@ -38,6 +38,15 @@ console.log(`[paths] mode=${IS_ELECTRON ? 'electron' : 'standalone'}`);
 // ── MIDDLEWARE ───────────────────────────────────────────
 app.use(express.json({ limit: '50mb' }));
 
+// Strip trailing slash dari URL .html/ supaya nggak 404
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html/') || (req.path.endsWith('/') && req.path.length > 1 && !req.path.includes('.'))) {
+    const newPath = req.path.replace(/\/+$/, '');
+    return res.redirect(301, newPath + (req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''));
+  }
+  next();
+});
+
 // Static files — public folder ada di __dirname (folder app, bukan AppData)
 // Di dev mode (non-packaged), selalu pakai __dirname
 // Di packaged mode, pakai app.asar
@@ -52,8 +61,10 @@ app.get('/ksk-ui.js', (req, res) =>
   res.sendFile(path.join(APP_PATH, 'ksk-ui.js'))
 );
 
-// Route shortcuts
-app.get('/customdeck', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customdeck.html')));
+// Route shortcuts - Pakai APP_PATH supaya jalan di dev & packaged mode
+app.get('/customdeck', (req, res) => res.sendFile(path.join(APP_PATH, 'public', 'customdeck.html')));
+app.get('/deck', (req, res) => res.sendFile(path.join(APP_PATH, 'public', 'deck.html')));
+app.get('/obs', (req, res) => res.sendFile(path.join(APP_PATH, 'public', 'obs.html')));
 
 // Assets dari folder data user
 app.use('/assets', express.static(MEDIA_DIR));

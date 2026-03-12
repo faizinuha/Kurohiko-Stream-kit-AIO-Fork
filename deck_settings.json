@@ -1,0 +1,42 @@
+{
+  "cols": 3,
+  "rows": 3,
+  "hideAll": false,
+  "hideMobileUI": false,
+  "showShortcuts": true,
+  "tabs": [
+    {
+      "id": "tab_1773286625651",
+      "name": "1",
+      "items": [],
+      "counters": [
+        "Tester.txt"
+      ],
+      "counter": "Tester.txt"
+    },
+    {
+      "id": "tab_1773286874841",
+      "name": "W",
+      "items": [],
+      "counters": [
+        "W.txt"
+      ],
+      "counter": "W.txt"
+    },
+    {
+      "id": "tab_1773286886520",
+      "name": "L",
+      "items": [],
+      "counters": [
+        "L.txt"
+      ],
+      "counter": "L.txt"
+    }
+  ],
+  "counterColors": {
+    "Tester.txt": "#38bdf8"
+  },
+  "shortcuts": {},
+  "counterShortcuts": {},
+  "tabShortcuts": {}
+}

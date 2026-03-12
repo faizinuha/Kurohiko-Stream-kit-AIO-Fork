@@ -1,0 +1,28 @@
+{
+  "ccbad5e9-d7cd-4c4e-8a40-84913fe82529.jfif": {
+    "animIn": "pop",
+    "animOut": "fade",
+    "animInSpeed": 400,
+    "animOutSpeed": 350,
+    "duration": 5,
+    "maxW": 600,
+    "maxH": 400,
+    "volume": 80,
+    "posX": 660,
+    "posY": 340,
+    "companionAudio": "",
+    "displayName": "Tester",
+    "chromaKey": false,
+    "chromaColor": "#00ff00",
+    "chromaSens": 0.35,
+    "chromaBlend": 0.1,
+    "cropTop": 0,
+    "cropBottom": 0,
+    "cropLeft": 0,
+    "cropRight": 0,
+    "thumbnailData": null,
+    "audioThumbMode": "text",
+    "audioThumbText": "Cha",
+    "audioThumbImg": null
+  }
+}

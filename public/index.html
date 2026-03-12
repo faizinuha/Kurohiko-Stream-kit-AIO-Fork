@@ -4,168 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kurohiko Stream Kit AIO</title>
+<link rel="icon" type="image/png" href="./build/icon.png">
+<link rel="stylesheet" href="./styles/index.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#09090d;--panel:#111118;--panel2:#18181f;--ac:#38bdf8;--ac2:#7dd3fc;--ac-dim:rgba(56,189,248,.1);--bd:#1e1e28;--bd2:#2a2a38;--tx:#e4e4f0;--tx2:#6b6b8a;--tx3:#3a3a50;--gn:#22c55e;--r:8px;--rs:5px;}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);overflow:hidden;}
-.mono{font-family:'JetBrains Mono',monospace;}
-.shell{display:flex;height:100vh;overflow:hidden;}
-.main-wrap{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
-
-/* SIDEBAR */
-#dmask{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:40;display:none;opacity:0;transition:opacity .2s;}
-#dmask.open{display:block;opacity:1;}
-#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--panel);border-right:1px solid var(--bd);display:flex;flex-direction:column;z-index:50;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
-#sidebar.open{transform:translateX(0);}
-.nav-item{display:flex;align-items:center;gap:11px;padding:10px 18px;color:var(--tx2);font-size:.76rem;font-weight:600;text-decoration:none;transition:all .15s;position:relative;cursor:pointer;}
-.nav-item:hover{color:var(--tx);background:rgba(255,255,255,.03);}
-.nav-item.active{color:var(--ac);}
-.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--ac);border-radius:0 3px 3px 0;}
-.nav-sep{height:1px;background:var(--bd);margin:6px 16px;}
-
-/* TOPBAR */
-.topbar{height:52px;background:var(--panel);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;padding:0 16px;flex-shrink:0;}
-.burger{background:none;border:1px solid var(--bd2);color:var(--tx2);width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
-.burger:hover{border-color:var(--ac);color:var(--ac);}
-.sp{flex:1;}
-.status-pill{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.08);color:var(--gn);padding:3px 9px;border-radius:99px;font-size:.58rem;font-weight:700;border:1px solid rgba(34,197,94,.18);letter-spacing:.5px;}
-.sdot{width:5px;height:5px;border-radius:50%;background:var(--gn);animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-.url-chip{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--bd2);border-radius:7px;padding:5px 10px;font-size:.6rem;}
-.url-chip code{color:var(--ac);white-space:nowrap;}
-.copy-btn{background:none;border:none;color:var(--tx3);cursor:pointer;padding:1px;transition:color .15s;display:flex;align-items:center;}
-.copy-btn:hover{color:var(--ac);}
-
-/* SCROLL */
-.scroll-area{flex:1;overflow-y:auto;padding:20px 18px 0;}
-.scroll-area::-webkit-scrollbar{width:4px;}
-.scroll-area::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px;}
-
-/* CARDS */
-.menu-card{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:16px 14px;cursor:pointer;transition:all .18s;text-decoration:none;display:flex;flex-direction:column;gap:7px;color:inherit;position:relative;overflow:hidden;}
-.menu-card::after{content:'';position:absolute;inset:0;background:var(--ac-dim);opacity:0;transition:opacity .18s;border-radius:inherit;}
-.menu-card:hover{border-color:rgba(56,189,248,.35);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.4);}
-.menu-card:hover::after{opacity:1;}
-.menu-card:hover .mc-arrow{color:var(--ac);transform:translateX(3px);}
-.mc-ic{font-size:1.3rem;position:relative;z-index:1;}
-.mc-title{font-size:.76rem;font-weight:700;position:relative;z-index:1;}
-.mc-desc{font-size:.62rem;color:var(--tx2);line-height:1.5;flex:1;position:relative;z-index:1;}
-.mc-arrow{align-self:flex-end;margin-top:6px;font-size:.58rem;font-weight:700;letter-spacing:1px;color:var(--tx3);position:relative;z-index:1;transition:color .18s,transform .18s;}
-.menu-card.feat{background:linear-gradient(135deg,#0c1a2e 0%,#0f0f1a 100%);border-color:rgba(56,189,248,.22);}
-.stat-card{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;}
-.stat-val{font-size:1.5rem;font-weight:900;line-height:1;}
-.stat-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx3);margin-top:4px;}
-.soon-badge{font-size:.5rem;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:1px;color:var(--ac);background:var(--ac-dim);padding:2px 6px;border-radius:4px;margin-top:auto;align-self:flex-start;}
-.act-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--panel);border:1px solid var(--bd);border-radius:8px;}
-
-/* SUPPORT BAR */
-.support-bar{flex-shrink:0;background:var(--panel);border-top:1px solid var(--bd);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.sup-btns{display:flex;gap:7px;flex-wrap:wrap;}
-.sup-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;font-size:.65rem;font-weight:700;cursor:pointer;text-decoration:none;border:1px solid transparent;transition:all .15s;white-space:nowrap;}
-.sup-patreon{background:rgba(255,66,77,.1);color:#ff424d;border-color:rgba(255,66,77,.22);}
-.sup-patreon:hover{background:rgba(255,66,77,.2);}
-.sup-saweria{background:rgba(245,166,35,.1);color:#f5a623;border-color:rgba(245,166,35,.2);}
-.sup-saweria:hover{background:rgba(245,166,35,.18);}
-.sup-topup{background:var(--ac-dim);color:var(--ac);border-color:rgba(56,189,248,.22);}
-.sup-topup:hover{background:rgba(56,189,248,.18);}
-
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:100;align-items:center;justify-content:center;padding:20px;}
-.modal-bg.open{display:flex;}
-.modal-box{background:var(--panel);border:1px solid var(--bd2);border-radius:16px;padding:24px;max-width:360px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.6);}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.fu{animation:fadeUp .35s ease both;}
-.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
-@media(max-width:640px){.url-chip{display:none;}}
-
-/* ── GLASSMORPHIC BACKGROUND ─────────────────────────────── */
-html,body{background:#070709!important;}
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 90% 60% at 15% -10%,rgba(56,189,248,.13) 0%,transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 110%,rgba(99,102,241,.09) 0%,transparent 55%),
-    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(56,189,248,.04) 0%,transparent 60%),
-    radial-gradient(ellipse 30% 25% at 80% 20%,rgba(239,68,68,.05) 0%,transparent 50%);
-}
-body::after{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  opacity:.025;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:180px 180px;
-}
-.shell,.app,.main-wrap{position:relative;z-index:1;}
-#sidebar{
-  background:rgba(7,7,9,.72)!important;
-  backdrop-filter:blur(24px)!important;
-  -webkit-backdrop-filter:blur(24px)!important;
-  border-right:1px solid rgba(255,255,255,.06)!important;
-}
-.topbar,.app .topbar{
-  background:#09090d!important;
-  backdrop-filter:none!important;
-  -webkit-backdrop-filter:none!important;
-  border-bottom:1px solid rgba(255,255,255,.06)!important;
-}
-
-/* ONBOARDING BUTTON */
-.ob-btn{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:var(--r);padding:12px 16px;
-  cursor:pointer;width:100%;text-align:left;
-  transition:all .2s;margin-bottom:14px;
-  font-family:'Syne',sans-serif;color:var(--tx);
-  position:relative;overflow:hidden;
-}
-.ob-btn::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(56,189,248,.06) 0%,transparent 60%);
-  opacity:0;transition:opacity .2s;
-}
-.ob-btn:hover{border-color:rgba(56,189,248,.3);transform:translateY(-1px);}
-.ob-btn:hover::before{opacity:1;}
-.ob-icon{font-size:1.4rem;flex-shrink:0;}
-.ob-main{font-size:.72rem;font-weight:800;}
-.ob-sub{font-size:.58rem;color:var(--tx2);margin-top:2px;}
-.ob-arrow{margin-left:auto;color:var(--tx3);font-size:.7rem;flex-shrink:0;}
-
-/* ONBOARDING MODAL */
-.ob-modal-bk{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
-.ob-modal-bk.open{display:flex;}
-.ob-modal{background:var(--panel);border:1px solid var(--bd2);border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
-.ob-modal::-webkit-scrollbar{width:3px;}
-.ob-modal::-webkit-scrollbar-thumb{background:var(--bd2);}
-.ob-modal-hd{padding:16px 18px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--panel);z-index:1;}
-.ob-modal-title{font-size:.78rem;font-weight:800;}
-.ob-modal-close{background:none;border:1px solid var(--bd2);color:var(--tx2);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.75rem;}
-.ob-modal-close:hover{border-color:var(--ac);color:var(--ac);}
-.ob-yt-btn{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.25);
-  color:#ff4444;padding:11px 16px;border-radius:var(--rs);
-  margin:14px 16px;cursor:pointer;text-decoration:none;
-  font-size:.68rem;font-weight:700;transition:all .15s;font-family:'Syne',sans-serif;
-}
-.ob-yt-btn:hover{background:rgba(255,0,0,.18);}
-.ob-features{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;}
-.ob-feat{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:var(--rs);background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);}
-.ob-feat-ic{font-size:1.2rem;flex-shrink:0;width:28px;text-align:center;}
-.ob-feat-title{font-size:.68rem;font-weight:700;margin-bottom:3px;}
-.ob-feat-desc{font-size:.58rem;color:var(--tx2);line-height:1.5;}
-
-/* MENU SECTION DIVIDER */
-.menu-sec-label{font-size:.5rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;margin-top:4px;}
-.menu-card.coming{opacity:.55;cursor:default;}
-.menu-card.coming:hover{transform:none;border-color:rgba(255,255,255,.06);}
-.menu-card.coming .mc-arrow{color:var(--tx3);}
-
-
-</style>
 </head>
 <body>
 <div class="shell">
@@ -203,13 +45,13 @@ body::after{
     <!-- Menu -->
     <div class="menu-sec-label fu d2">Tools Utama</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px;" class="fu d2">
-      <a href="/customdeck.html" class="menu-card feat">
+      <a href="customdeck.html" class="menu-card feat">
         <div class="mc-ic">🎭</div>
         <div class="mc-title">Custom Deck</div>
         <div class="mc-desc">Upload meme, atur animasi, posisi, ukuran overlay.</div>
         <div class="mc-arrow">→ OPEN</div>
       </a>
-      <a href="/deck.html" class="menu-card">
+      <a href="deck.html" class="menu-card">
         <div class="mc-ic">🎮</div>
         <div class="mc-title">Deck View</div>
         <div class="mc-desc">Trigger meme langsung ke OBS.</div>
@@ -221,7 +63,7 @@ body::after{
         <div class="mc-desc">Buka deck di HP via WiFi.</div>
         <div class="mc-arrow">→ CONNECT</div>
       </a>
-      <a href="/obs.html" target="_blank" class="menu-card">
+      <a href="obs.html" target="_blank" class="menu-card">
         <div class="mc-ic">⬡</div>
         <div class="mc-title">OBS Overlay</div>
         <div class="mc-desc">URL Browser Source untuk OBS.</div>
@@ -372,6 +214,49 @@ body::after{
     </div>
     <button onclick="copyPhoneUrl()" style="width:100%;background:var(--ac);border:none;color:#000;padding:10px;border-radius:8px;font-size:.75rem;font-weight:800;cursor:pointer;margin-bottom:8px;">Copy URL</button>
     <button onclick="closeConnect()" style="width:100%;background:var(--panel2);border:1px solid var(--bd2);color:var(--tx2);padding:10px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;">Close</button>
+  </div>
+</div>
+
+<!-- OBS PLUGINS MODAL -->
+<div class="modal-bg" id="plugins-modal">
+  <div class="modal-box" style="max-width:480px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:.9rem;font-weight:800;">🔌 Best OBS Plugins</div>
+      <button onclick="closePlugins()" style="background:none;border:1px solid var(--bd2);color:var(--tx2);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:.8rem;">✕</button>
+    </div>
+    <div style="font-size:.68rem;color:var(--tx2);margin-bottom:14px;line-height:1.6;">Rekomendasi plugin terbaik untuk ningkatin kualitas stream kamu!</div>
+    
+    <div style="display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;padding-right:4px;" class="ksk-scroll">
+      <div style="background:var(--panel2);border:1px solid var(--bd2);border-radius:10px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px;">
+          <div style="font-size:.75rem;font-weight:800;color:var(--ac);">Move Transition</div>
+          <a href="https://obsproject.com/forum/resources/move-transition.1177/" target="_blank" style="font-size:.6rem;color:#818cf8;text-decoration:none;font-weight:700;">DOWNLOAD ↗</a>
+        </div>
+        <div style="font-size:.65rem;color:var(--tx2);line-height:1.5;">Bikin transisi antar scene jadi super smooth dengan animasi zoom, geser, dan putar otomatis.</div>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--bd2);border-radius:10px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px;">
+          <div style="font-size:.75rem;font-weight:800;color:var(--ac);">StreamFX</div>
+          <a href="https://github.com/Xaymar/obs-StreamFX" target="_blank" style="font-size:.6rem;color:#818cf8;text-decoration:none;font-weight:700;">DOWNLOAD ↗</a>
+        </div>
+        <div style="font-size:.65rem;color:var(--tx2);line-height:1.5;">Plugin "Dewa" untuk efek visual: 3D Transform, Blur, Glow, Displacement, dan shader keren lainnya.</div>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--bd2);border-radius:10px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px;">
+          <div style="font-size:.75rem;font-weight:800;color:var(--ac);">Advanced Scene Switcher</div>
+          <a href="https://obsproject.com/forum/resources/advanced-scene-switcher.395/" target="_blank" style="font-size:.6rem;color:#818cf8;text-decoration:none;font-weight:700;">DOWNLOAD ↗</a>
+        </div>
+        <div style="font-size:.65rem;color:var(--tx2);line-height:1.5;">Otomatisasi OBS! Ganti scene berdasarkan waktu, audio, game yang kebuka, atau trigger lainnya.</div>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--bd2);border-radius:10px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px;">
+          <div style="font-size:.75rem;font-weight:800;color:var(--ac);">Aitum Vertical</div>
+          <a href="https://aitum.tv/products/vertical" target="_blank" style="font-size:.6rem;color:#818cf8;text-decoration:none;font-weight:700;">DOWNLOAD ↗</a>
+        </div>
+        <div style="font-size:.65rem;color:var(--tx2);line-height:1.5;">Wajib buat TikTok/Reels/Shorts! Stream & Record format vertikal langsung dari OBS barengan sama stream utama.</div>
+      </div>
+    </div>
+    <button onclick="closePlugins()" style="width:100%;margin-top:14px;background:var(--panel2);border:1px solid var(--bd2);color:var(--tx2);padding:10px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;">Tutup</button>
   </div>
 </div>
 
@@ -907,7 +792,9 @@ function initScToggle() {
 }
 
 
-function openBestPlugins() { toast('Coming soon — Best OBS Plugins'); }
+function openBestPlugins() { document.getElementById('plugins-modal').classList.add('open'); }
+function closePlugins() { document.getElementById('plugins-modal').classList.remove('open'); }
+document.getElementById('plugins-modal').addEventListener('click', e => { if(e.target===document.getElementById('plugins-modal')) closePlugins(); });
 </script>
 <!-- ONBOARDING MODAL -->
 <div class="ob-modal-bk" id="ob-modal">
