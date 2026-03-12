@@ -1,6 +1,6 @@
 # 🚀 Update & Optimize Log
 
-File ini mencatat semua perubahan, pembersihan (clean-up), dan optimasi yang telah dilakukan pada proyek **Kurohiko Stream Kit AIO**.
+File ini mencatat semua perubahan, pembersihan (clean-up), dan optimasi yang telah dilakukan pada proyek **Kurohiko Stream Kit AIO** (Versi 0.0.5).
 
 ## 🛠️ Perubahan Terbaru
 
