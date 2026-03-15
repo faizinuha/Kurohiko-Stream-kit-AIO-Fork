@@ -2,7 +2,7 @@
   "name": "KSK-Stream-kit-aio",
   "productName" : "Kurohiko Stream kit AIO",
   "author": "Kurohiko",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Kurohiko Stream Kit AIO — Meme overlay & deck controller untuk streamer",
   "main": "electron/main.js",
   "scripts": {
@@ -70,7 +70,8 @@
       "createStartMenuShortcut": true,
       "shortcutName": "KSK Streamkit AIO",
       "displayLanguageSelector": false,
-      "language": "1057"
+      "language": "1057",
+      "perMachine": true
     },
     "directories": {
       "output": "dist",

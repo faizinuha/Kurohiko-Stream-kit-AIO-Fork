@@ -15,12 +15,15 @@ File ini mencatat semua perubahan, pembersihan (clean-up), dan optimasi yang tel
 
 ### 3. **Super Soundboard Template (Custom Deck)**
 *   **⚡ Tombol Ajaib**: Klik tombol "TEMPLATE" di halaman Custom Deck buat buka gudang suara meme.
-*   **Download Sekali Klik**: Saya sudah tambahin tombol download langsung buat suara legendaris (Bruh, Emotional Damage, Wow, Laugh, sampai Taco Bell). Tinggal klik, simpan, terus upload.
+*   **Auto-Download Langsung ke Deck**: File suara (Bruh, Wasted, Discord, dll) kini bisa di-download dengan sekali klik dan **langsung masuk otomatis** ke dalam library aplikasi tanpa perlu pindah browser atau upload manual!
+*   **Grup & Kategori Rapi**: Tombol-tombol template kini disortir rapi berdasarkan kategori seperti: `🔴 REACTION`, `🔴 GAMING & EFFECTS`, dan `🔴 RANDOM FUNNY`.
 *   **Integrasi MyInstants**: Kalau list saya kurang, sudah ada link langsung ke MyInstants buat cari ribuan suara meme lainnya.
-*   **Sistem Download Baru**: Semua link download sekarang kebuka di tab baru (`target="_blank"`) biar halaman Custom Deck Kakak gak ketutup pas lagi asik pilih-pilih suara.
 
-### 4. **Pembersihan Sistem & UI**
-*   **Visual Premium**: Pakai Tailwind CSS biar tampilan modalnya kerasa mewah dan gak kayak aplikasi jadul.
+### 4. **API Baru (Background System)**
+*   **Download Template API**: Menambahkan endpoint `/api/download-template` di server.js. Fungsinya sebagai *jembatan* untuk mengambil URL eksteral (.mp3) dan menyimpannya langsung ke folder lokal `assets` KSK! 
+
+### 5. **Pembersihan Sistem & UI**
+*   **Visual Premium**: Pakai Tailwind CSS biar tampilan modalnya kerasa mewah dan gak kayak aplikasi jadul (lengkap dengan *scroll custom* yang rapi).
 *   **Setup Git yang Rapi**: Mengupdate `.gitignore` biar file-file sampah atau file settingan pribadi Kakak gak ikut masuk kalau Kakak mau share kodingannya ke GitHub. Jadi foldernya lebih "bersih".
 
 ---

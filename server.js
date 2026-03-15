@@ -36,7 +36,7 @@ console.log(`[paths] media=${MEDIA_DIR}`);
 console.log(`[paths] mode=${IS_ELECTRON ? 'electron' : 'standalone'}`);
 
 // ── MIDDLEWARE ───────────────────────────────────────────
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '500mb' }));
 
 // Strip trailing slash dari URL .html/ supaya nggak 404
 app.use((req, res, next) => {
@@ -134,6 +134,20 @@ app.post('/upload', upload.any(), (req, res) => {
   if (!req.files || !req.files.length) return res.status(400).json({ ok: false, error: 'No files' });
   console.log('Uploaded:', req.files.map(f => f.filename));
   res.json({ ok: true, files: req.files.map(f => f.filename) });
+});
+
+app.post('/api/download-template', async (req, res) => {
+  const { url, filename } = req.body;
+  if (!url || !filename) return res.status(400).json({ok: false, error: 'Url/filename required'});
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return res.status(response.status).json({ok: false, error: 'HTTP ' + response.status});
+    const buffer = await response.arrayBuffer();
+    fs.writeFileSync(path.join(MEDIA_DIR, filename), Buffer.from(buffer));
+    res.json({ok: true, filename});
+  } catch(e) {
+    res.status(500).json({ok: false, error: String(e)});
+  }
 });
 
 app.post('/api/media/:filename/settings', (req, res) => {
@@ -302,11 +316,18 @@ function loadAppConfig() {
 app.get('/api/config', (req, res) => res.json(loadAppConfig()));
 
 // Choose folder — hanya works di Electron (via dialog)
+// agar Lewat browser juga bisa diaktifkan lagi
+
 app.post('/api/choose-folder', async (req, res) => {
-  if (!IS_ELECTRON) return res.json({ ok: false, error: 'Only available in Electron' });
+  if(IS_ELECTRON){
+    return res.json({ ok: true, error: 'Use Electron Settings dialog' });
+  } else {
+    res.json({ ok: true, error: 'Use Electron Settings dialog' });
+  }
+  // if (!IS_ELECTRON) return res.json({ ok: true, error: 'Only available in Electron' });
+  // res.json({ ok: true, error: 'Use Electron Settings dialog' });
   // Kirim request ke Electron main process lewat IPC tidak bisa dari server
   // User harus pilih dari Settings di Electron window
-  res.json({ ok: false, error: 'Use Electron Settings dialog' });
 });
 
 // ── BACKUP & RESTORE ────────────────────────────────────
